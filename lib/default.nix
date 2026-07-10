@@ -1,0 +1,3 @@
+{...}: {
+  pins = import ../pins;
+}

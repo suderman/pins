@@ -11,7 +11,7 @@ policy, hash refresh behavior, and validation without repeating current versions
 
 - kind: `fetchurl-release`
 - pins: `pins/fetchurl.nix`, `citron`
-- package: `pkgs/appimage-path.nix` via `packages.${system}.citron`
+- package: `packages/citron.nix` using `builders/appimage-path.nix` via `packages.${system}.citron`
 - upstream: https://github.com/citron-neo/CI/releases
 - update rule: use the latest acceptable Linux AppImage from the `nightly-linux` release; preserve the existing `_v3` CPU baseline unless intentionally changed
 - hash rule: after changing `url`, refresh `sha256` for the downloaded AppImage
@@ -21,7 +21,7 @@ policy, hash refresh behavior, and validation without repeating current versions
 
 - kind: `fetchurl-release`
 - pins: `pins/fetchurl.nix`, `eden`
-- package: `pkgs/appimage-path.nix` via `packages.${system}.eden`
+- package: `packages/eden.nix` using `builders/appimage-path.nix` via `packages.${system}.eden`
 - upstream: https://git.eden-emu.dev/eden-emu/eden/releases
 - update rule: use the latest acceptable Linux AppImage release; be explicit before changing RC-versus-stable policy
 - hash rule: after changing `url`, refresh `sha256` for the downloaded AppImage
@@ -33,7 +33,7 @@ policy, hash refresh behavior, and validation without repeating current versions
 
 - kind: `fetch-github-rev`
 - pins: `pins/github.nix`, `honcho`
-- package: `pkgs/github-source.nix` via `packages.${system}.honcho-src`
+- package: `packages/honcho-src.nix` using `builders/github-source.nix` via `packages.${system}.honcho-src`
 - upstream: https://github.com/plastic-labs/honcho/releases
 - update rule: use the newest tagged release, not branch head
 - hash rule: after changing `rev`, refresh `hash` for the fetched source
@@ -43,7 +43,7 @@ policy, hash refresh behavior, and validation without repeating current versions
 
 - kind: `fetch-github-rev`
 - pins: `pins/github.nix`, `mpd-url`
-- package: `pkgs/mpd-url.nix` via `packages.${system}.mpd-url`
+- package: `packages/mpd-url.nix` using `builders/mpd-url.nix` via `packages.${system}.mpd-url`
 - upstream: https://github.com/suderman/mpd-url
 - update rule: track the latest default-branch commit only while that remains intentional
 - hash rule: after changing `rev`, refresh `hash` for the fetched source
@@ -56,7 +56,7 @@ policy, hash refresh behavior, and validation without repeating current versions
 
 - kind: `firefox-xpi`
 - pins: `pins/firefox.nix`, `easy-container-shortcuts`
-- package: `pkgs/easy-container-shortcuts.nix` via `packages.${system}.easy-container-shortcuts`
+- package: `packages/easy-container-shortcuts.nix` using `builders/easy-container-shortcuts.nix` via `packages.${system}.easy-container-shortcuts`
 - upstream: https://addons.mozilla.org/en-US/firefox/addon/easy-container-shortcuts/
 - update rule: use the newest stable addon release matching the existing XPI download pattern
 - hash rule: after changing `url`, refresh `sha256` for the downloaded XPI

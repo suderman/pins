@@ -36,7 +36,7 @@ and update the registry notes only if the dependency shape changed.
 
 1. Identify the dependency or dependency family in scope.
 2. Read the matching entry in `references.md`.
-3. Read the relevant `pins/*.nix` and `pkgs/*.nix` files.
+3. Read the relevant `pins/*.nix`, `packages/*.nix`, and `builders/*.nix` files.
 4. Check upstream according to the documented update rule.
 5. Update the smallest coherent set of fields: version/tag/rev, URL/image, and hash.
 6. Run the lightest useful validation command from the registry.

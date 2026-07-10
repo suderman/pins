@@ -7,6 +7,10 @@ This repo is intentionally small. Service policy stays in the consuming NixOS
 flake; this flake only carries reusable package definitions and centralized
 release metadata.
 
+This flake uses `numtide/blueprint` for output mapping and `treefmt-nix` for
+formatting. Package output wrappers live in `packages/`; shared implementation
+files live in `builders/`.
+
 ## Outputs
 
 - `packages.${system}.easy-container-shortcuts`

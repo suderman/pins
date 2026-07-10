@@ -3,48 +3,51 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
+
+    # Map folder structure to flake outputs.
+    # <https://github.com/numtide/blueprint>
+    blueprint.url = "github:numtide/blueprint";
+    blueprint.inputs.nixpkgs.follows = "nixpkgs";
+
+    # Code formatting.
+    # <https://github.com/numtide/treefmt-nix>
+    treefmt-nix.url = "github:numtide/treefmt-nix";
+    treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = {
-    self,
-    nixpkgs,
-  }: let
-    inherit (nixpkgs) lib;
+  outputs = inputs: let
+    inherit (inputs.nixpkgs) lib;
     systems = [
       "x86_64-linux"
       "aarch64-linux"
     ];
-    forAllSystems = f:
-      lib.genAttrs systems (system:
-        f (import nixpkgs {
-          inherit system;
-        }));
-  in {
-    lib = {
-      pins = import ./pins;
+
+    blueprint = inputs.blueprint {
+      inherit inputs systems;
     };
 
-    packages = forAllSystems (pkgs:
-      import ./pkgs {
-        inherit pkgs;
-        pins = self.lib.pins;
-      });
+    filterPackages = system: packages:
+      builtins.removeAttrs (lib.filterAttrs (
+          _: package: let
+            platforms = package.meta.platforms or [];
+          in
+            platforms == [] || lib.elem system platforms
+        )
+        packages) ["formatter"];
+  in {
+    inherit (blueprint) formatter lib;
 
-    checks = forAllSystems (pkgs: self.packages.${pkgs.stdenv.hostPlatform.system});
+    packages = lib.mapAttrs filterPackages blueprint.packages;
 
-    formatter = forAllSystems (pkgs:
-      pkgs.writeShellApplication {
-        name = "suderpkgs-fmt";
-        runtimeInputs = [pkgs.alejandra];
-        text = ''
-          if [ "$#" -eq 0 ]; then
-            set -- .
-          fi
+    checks =
+      lib.mapAttrs (
+        _: checks: builtins.removeAttrs checks ["pkgs-formatter"]
+      )
+      blueprint.checks;
 
-          alejandra "$@"
-        '';
-      });
-
-    overlays.default = import ./overlays/default.nix;
+    overlays.default = final: _prev: {
+      suderPins = import ./pins;
+      suderpkgs = filterPackages final.stdenv.hostPlatform.system (blueprint.mkPackagesFor final);
+    };
   };
 }
