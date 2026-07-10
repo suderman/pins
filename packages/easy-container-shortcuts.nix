@@ -7,5 +7,5 @@
 in
   pkgs.callPackage ../builders/easy-container-shortcuts.nix {
     inherit buildFirefoxXpiAddon;
-    pin = flake.lib.pins.firefox.easy-container-shortcuts;
+    pin = flake.pins.firefox.easy-container-shortcuts;
   }

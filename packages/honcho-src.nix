@@ -4,5 +4,5 @@
   ...
 }:
 pkgs.callPackage ../builders/github-source.nix {
-  pin = flake.lib.pins.github.honcho;
+  pin = flake.pins.github.honcho;
 }

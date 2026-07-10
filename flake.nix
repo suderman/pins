@@ -17,6 +17,7 @@
 
   outputs = inputs: let
     inherit (inputs.nixpkgs) lib;
+    pins = import ./pins;
     systems = [
       "x86_64-linux"
       "aarch64-linux"
@@ -35,7 +36,8 @@
         )
         packages) ["formatter"];
   in {
-    inherit (blueprint) formatter lib;
+    inherit pins;
+    inherit (blueprint) formatter;
 
     packages = lib.mapAttrs filterPackages blueprint.packages;
 
@@ -46,7 +48,7 @@
       blueprint.checks;
 
     overlays.default = final: _prev: {
-      suderPins = import ./pins;
+      suderPins = pins;
       suderpkgs = filterPackages final.stdenv.hostPlatform.system (blueprint.mkPackagesFor final);
     };
   };

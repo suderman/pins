@@ -4,5 +4,5 @@
   ...
 }:
 pkgs.callPackage ../builders/appimage-path.nix {
-  pin = flake.lib.pins.fetchurl.citron;
+  pin = flake.pins.fetchurl.citron;
 }
