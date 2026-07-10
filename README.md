@@ -18,11 +18,11 @@ files live in `builders/`.
 - `packages.${system}.mpd-url`
 - `packages.x86_64-linux.citron`
 - `packages.x86_64-linux.eden`
-- `lib.pins.containers`
-- `lib.pins.fetchurl`
-- `lib.pins.firefox`
-- `lib.pins.github`
-- `lib.pins.chromium`
+- `pins.containers`
+- `pins.fetchurl`
+- `pins.firefox`
+- `pins.github`
+- `pins.chromium`
 - `overlays.default`
 
 ## Consuming
@@ -38,26 +38,26 @@ Add this flake once:
 }
 ```
 
-Use package outputs directly from modules that already receive `flake`:
+Use package outputs from Blueprint modules that already receive `perSystem`:
 
 ```nix
-flake.inputs.suderpkgs.packages.${pkgs.system}.honcho-src
+perSystem.suderpkgs.honcho-src
 ```
 
 Use centralized image/tag metadata without importing a package set:
 
 ```nix
-flake.inputs.suderpkgs.lib.pins.containers.home-assistant.image
-flake.inputs.suderpkgs.lib.pins.containers.immich.serverImage
-flake.inputs.suderpkgs.lib.pins.containers.whoami.image
-flake.inputs.suderpkgs.lib.pins.containers.zwave-js-ui.version
+flake.inputs.suderpkgs.pins.containers.home-assistant.image
+flake.inputs.suderpkgs.pins.containers.immich.serverImage
+flake.inputs.suderpkgs.pins.containers.whoami.image
+flake.inputs.suderpkgs.pins.containers.zwave-js-ui.version
 ```
 
 Use pinned GitHub source metadata for non-container services like Honcho:
 
 ```nix
-flake.inputs.suderpkgs.packages.${pkgs.system}.honcho-src
-flake.inputs.suderpkgs.lib.pins.github.honcho.rev
+perSystem.suderpkgs.honcho-src
+flake.inputs.suderpkgs.pins.github.honcho.rev
 ```
 
 Or install the overlay and use:
@@ -84,5 +84,5 @@ tags such as `latest`.
 ```sh
 nix flake check --all-systems --no-build
 nix build .#mpd-url
-nix eval .#lib.pins.containers.home-assistant.image
+nix eval .#pins.containers.home-assistant.image
 ```
