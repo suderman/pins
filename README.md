@@ -79,6 +79,44 @@ For scheduled maintenance, check every entry under the registry's container tag
 section against its upstream URL/API. Update only specific tags, not floating
 tags such as `latest`.
 
+## Updating Pins
+
+Enter the development shell with `direnv allow` or `nix develop`. It exposes:
+
+- `pins-check`
+- `pins-report`
+- `pins-apply-safe`
+- `pins-validate`
+- `pins-agent`
+
+The commands wrap the scripts below and accept the same extra arguments.
+
+Run the deterministic updater to check upstreams without editing files. The
+default output is a concise terminal summary:
+
+```sh
+tools/update-pins.py check
+```
+
+Use `pins-report` or `tools/update-pins.py report` for a Markdown table, and
+`--format json` when full upstream error details are needed.
+
+Apply safe deterministic updates, validate, commit, and push:
+
+```sh
+tools/update-pins.py apply --safe --validate --flake-check --commit --push
+```
+
+Run the agent-supervised workflow for scheduled maintenance:
+
+```sh
+tools/update-with-agent.sh
+```
+
+The agent wrapper uses the local `pi` coding-agent harness with
+`minimax/MiniMax-M3:high`, so it is intended for hosts where those credentials
+are already configured.
+
 ## Validation
 
 ```sh

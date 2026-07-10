@@ -39,11 +39,11 @@
   };
 
   rsshub-redis = rec {
-    tag = "6.2";
+    tag = "6.2.22";
     ref = tag;
     image = "redis:${ref}";
     upstream = "https://hub.docker.com/_/redis/tags";
-    updatePolicy = "Treat Redis major-version bumps as higher risk.";
+    updatePolicy = "Use full patch tags within the pinned major/minor line; treat major-version bumps as higher risk.";
   };
 
   unifi = rec {

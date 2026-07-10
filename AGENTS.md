@@ -80,6 +80,34 @@ nix eval .#pins.containers.home-assistant.image
 nix eval .#pins.containers.whoami.image
 ```
 
+## Automated Update Workflow
+
+Deterministic pin checks and safe updates live in `tools/update-pins.py`.
+
+Use deterministic-only maintenance when no review is needed:
+
+```sh
+tools/update-pins.py apply --safe --validate --flake-check --commit --push
+```
+
+Use the agent-supervised scheduled workflow when review-required entries should
+be considered:
+
+```sh
+tools/update-with-agent.sh
+```
+
+The agent wrapper calls:
+
+```sh
+pi --model minimax/MiniMax-M3:high -p "$(<tools/update-agent-prompt.md)"
+```
+
+The updater may automatically modify only entries marked as safe in its internal
+registry. Review-required entries must be selected explicitly with
+`tools/update-pins.py apply --entry <name> --reviewed`. Report-only entries must
+not be modified by scheduled maintenance.
+
 # Manual Dependency Registry
 
 This section documents how to update each manual dependency in `suderpkgs`.
@@ -211,7 +239,7 @@ Ignore floating tags such as `latest` unless the entry explicitly tracks one.
 - kind: `container-tag`
 - pins: `pins/containers.nix`, `rsshub-redis`
 - upstream: https://hub.docker.com/_/redis/tags
-- update rule: use a Redis tag compatible with RSSHub; treat major-version changes as higher risk
+- update rule: use the newest full patch tag within the pinned Redis major/minor line compatible with RSSHub; treat major-version changes as higher risk
 - hash rule: no source hash; update tag metadata only unless digest pinning is introduced later
 - validate: `nix eval .#pins.containers.rsshub-redis.image`
 

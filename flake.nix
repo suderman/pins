@@ -13,6 +13,11 @@
     # <https://github.com/numtide/treefmt-nix>
     treefmt-nix.url = "github:numtide/treefmt-nix";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
+
+    # Development shell.
+    # <https://github.com/numtide/devshell>
+    devshell.url = "github:numtide/devshell";
+    devshell.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs = inputs: let
@@ -37,7 +42,7 @@
         packages) ["formatter"];
   in {
     inherit pins;
-    inherit (blueprint) formatter;
+    inherit (blueprint) devShells formatter;
 
     packages = lib.mapAttrs filterPackages blueprint.packages;
 
