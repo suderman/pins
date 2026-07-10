@@ -72,9 +72,8 @@ pkgs.suderPins.containers.codex-lb.image
 Current versions live in `pins/*.nix`. Do not duplicate current values in prose
 unless there is a strong reason; prose drifts faster than Nix data.
 
-The `.opencode/skills/update-dependencies/references.md` file documents how to
-check each upstream, what counts as an acceptable update, and how to validate a
-change.
+The root `AGENTS.md` file documents how to check each upstream, what counts as
+an acceptable update, and how to validate a change.
 
 For scheduled maintenance, check every entry under the registry's container tag
 section against its upstream URL/API. Update only specific tags, not floating
