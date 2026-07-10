@@ -74,6 +74,11 @@ policy, hash refresh behavior, and validation without repeating current versions
 
 ## Container Tags
 
+Scheduled checks should inspect every entry in this section. For Docker Hub,
+the API endpoint is `https://hub.docker.com/v2/repositories/<namespace>/<repository>/tags?page_size=25`.
+For GHCR package pages, use the linked package versions page or GitHub API.
+Ignore floating tags such as `latest` unless the entry explicitly tracks one.
+
 ### backblaze-personal-wine
 
 - kind: `container-tag`
@@ -128,6 +133,24 @@ policy, hash refresh behavior, and validation without repeating current versions
 - hash rule: no source hash; update tag metadata only unless digest pinning is introduced later
 - validate: `nix eval .#lib.pins.containers.rsshub-redis.image`
 
+### unifi
+
+- kind: `container-tag`
+- pins: `pins/containers.nix`, `unifi`
+- upstream: https://hub.docker.com/r/jacobalberty/unifi/tags
+- update rule: intentionally conservative; check and report newer Docker Hub tags, but do not bump from the 7.5 controller line without explicit approval
+- hash rule: no source hash; update tag metadata only unless digest pinning is introduced later
+- validate: `nix eval .#lib.pins.containers.unifi.image`
+
+### whoami
+
+- kind: `container-tag`
+- pins: `pins/containers.nix`, `whoami`
+- upstream: https://hub.docker.com/r/traefik/whoami/tags
+- update rule: use the newest full semver tag; ignore `latest` and arch-specific tags such as `*-amd64`, `*-arm64`, and `*-armv7`
+- hash rule: no source hash; update tag metadata only unless digest pinning is introduced later
+- validate: `nix eval .#lib.pins.containers.whoami.image`
+
 ### whoogle-search
 
 - kind: `container-tag`
@@ -145,7 +168,3 @@ policy, hash refresh behavior, and validation without repeating current versions
 - update rule: use the newest tagged container version matching the Home Assistant module expectations
 - hash rule: no source hash; update tag metadata only unless digest pinning is introduced later
 - validate: `nix eval .#lib.pins.containers.zwave-js-ui.image`
-
-## Explicit Non-Tracked Policies
-
-- Unifi remains in the consuming NixOS flake for now and should stay pinned at `7.5` unless explicitly revisited.

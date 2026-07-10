@@ -46,6 +46,22 @@
     updatePolicy = "Treat Redis major-version bumps as higher risk.";
   };
 
+  unifi = rec {
+    version = "7.5";
+    ref = version;
+    image = "jacobalberty/unifi:v${ref}";
+    upstream = "https://hub.docker.com/r/jacobalberty/unifi/tags";
+    updatePolicy = "Intentionally conservative; report newer tags before bumping from the 7.5 controller line.";
+  };
+
+  whoami = rec {
+    version = "1.11.0";
+    ref = version;
+    image = "traefik/whoami:v${ref}";
+    upstream = "https://hub.docker.com/r/traefik/whoami/tags";
+    updatePolicy = "Use the newest full semver tag; avoid latest and arch-specific tags.";
+  };
+
   whoogle-search = rec {
     version = "1.2.5";
     ref = version;

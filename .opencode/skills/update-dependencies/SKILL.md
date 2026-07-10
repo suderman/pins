@@ -42,6 +42,25 @@ and update the registry notes only if the dependency shape changed.
 6. Run the lightest useful validation command from the registry.
 7. Report old and new values, refreshed hashes, validation, and skipped entries.
 
+## Scheduled Container Checks
+
+For scheduled maintenance, enumerate every entry under `## Container Tags` in
+`references.md`, then compare its current value in `pins/containers.nix` with
+the newest acceptable upstream tag.
+
+For Docker Hub entries, prefer the API endpoint shaped like:
+
+```text
+https://hub.docker.com/v2/repositories/<namespace>/<repository>/tags?page_size=25
+```
+
+For GitHub Container Registry entries, use the package page or GitHub API when
+available. Ignore floating tags such as `latest` and architecture-specific tags
+unless the registry entry explicitly says otherwise.
+
+Conservative pins should still be checked and reported, but not bumped without
+an explicit instruction or an update-policy change.
+
 ## Guardrails
 
 - Do not switch a pin from release/tag tracking to branch tracking unless asked.
@@ -57,4 +76,5 @@ nix flake check
 nix build .#mpd-url
 nix build .#honcho-src
 nix eval .#lib.pins.containers.home-assistant.image
+nix eval .#lib.pins.containers.whoami.image
 ```

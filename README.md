@@ -48,7 +48,16 @@ Use centralized image/tag metadata without importing a package set:
 
 ```nix
 flake.inputs.suderpkgs.lib.pins.containers.home-assistant.image
+flake.inputs.suderpkgs.lib.pins.containers.immich.serverImage
+flake.inputs.suderpkgs.lib.pins.containers.whoami.image
 flake.inputs.suderpkgs.lib.pins.containers.zwave-js-ui.version
+```
+
+Use pinned GitHub source metadata for non-container services like Honcho:
+
+```nix
+flake.inputs.suderpkgs.packages.${pkgs.system}.honcho-src
+flake.inputs.suderpkgs.lib.pins.github.honcho.rev
 ```
 
 Or install the overlay and use:
@@ -66,6 +75,10 @@ unless there is a strong reason; prose drifts faster than Nix data.
 The `.opencode/skills/update-dependencies/references.md` file documents how to
 check each upstream, what counts as an acceptable update, and how to validate a
 change.
+
+For scheduled maintenance, check every entry under the registry's container tag
+section against its upstream URL/API. Update only specific tags, not floating
+tags such as `latest`.
 
 ## Validation
 
