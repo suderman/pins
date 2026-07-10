@@ -12,8 +12,8 @@ policy, hash refresh behavior, and validation without repeating current versions
 - kind: `fetchurl-release`
 - pins: `pins/fetchurl.nix`, `citron`
 - package: `pkgs/appimage-path.nix` via `packages.${system}.citron`
-- upstream: https://git.citron-emu.org/Citron/Emulator/releases
-- update rule: use the latest acceptable Linux AppImage release matching the existing stable Citron filename pattern
+- upstream: https://github.com/citron-neo/CI/releases
+- update rule: use the latest acceptable Linux AppImage from the `nightly-linux` release; preserve the existing `_v3` CPU baseline unless intentionally changed
 - hash rule: after changing `url`, refresh `sha256` for the downloaded AppImage
 - validate: `nix build .#citron`
 
