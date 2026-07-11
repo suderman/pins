@@ -1,29 +1,23 @@
 # suderpkgs
 
-Personal Nix packages and manually tracked upstream pins that do not fit well
-as separate flake inputs.
+Manually tracked upstream pins that do not fit well as separate flake inputs.
 
 This repo is intentionally small. Service policy stays in the consuming NixOS
-flake; this flake only carries reusable package definitions and centralized
-release metadata.
+flake; package wrappers stay there too. This flake carries centralized release
+metadata and update automation.
 
-This flake uses `numtide/blueprint` for output mapping and `treefmt-nix` for
-formatting. Package output wrappers live in `packages/`; shared implementation
-files live in `builders/`.
+This flake uses `treefmt-nix` for formatting and a small development shell for
+pin maintenance commands.
 
 ## Outputs
 
-- `packages.${system}.easy-container-shortcuts`
-- `packages.${system}.honcho-src`
-- `packages.${system}.mpd-url`
-- `packages.x86_64-linux.citron`
-- `packages.x86_64-linux.eden`
 - `pins.containers`
 - `pins.fetchurl`
 - `pins.firefox`
 - `pins.github`
 - `pins.chromium`
-- `overlays.default`
+- `devShells.${system}.default`
+- `formatter.${system}`
 
 ## Consuming
 
@@ -38,12 +32,6 @@ Add this flake once:
 }
 ```
 
-Use package outputs from Blueprint modules that already receive `perSystem`:
-
-```nix
-perSystem.suderpkgs.honcho-src
-```
-
 Use centralized image/tag metadata without importing a package set:
 
 ```nix
@@ -53,18 +41,11 @@ flake.inputs.suderpkgs.pins.containers.whoami.image
 flake.inputs.suderpkgs.pins.containers.zwave-js-ui.version
 ```
 
-Use pinned GitHub source metadata for non-container services like Honcho:
+Use pinned source metadata for local package wrappers in the consuming flake:
 
 ```nix
-perSystem.suderpkgs.honcho-src
 flake.inputs.suderpkgs.pins.github.honcho.rev
-```
-
-Or install the overlay and use:
-
-```nix
-pkgs.suderpkgs.mpd-url
-pkgs.suderPins.containers.codex-lb.image
+flake.inputs.suderpkgs.pins.github.honcho.hash
 ```
 
 ## Pin Policy
@@ -87,8 +68,6 @@ Enter the development shell with `direnv allow` or `nix develop`. It exposes:
 - `pins-report`
 - `pins-apply-safe`
 - `pins-validate`
-- `pins-agent`
-- `pins-agent-ci`
 
 The commands wrap the scripts below and accept the same extra arguments.
 
@@ -108,26 +87,15 @@ Apply safe deterministic updates, validate, commit, and push:
 tools/update-pins.py apply --safe --validate --flake-check --commit --push
 ```
 
-Run the agent-supervised workflow for scheduled maintenance:
-
-```sh
-tools/update-with-agent.sh
-```
-
-The agent wrapper uses the local `pi` coding-agent harness with
-`minimax/MiniMax-M3:high`, so it is intended for hosts where those credentials
-are already configured.
-
 GitHub Actions scheduled maintenance uses `.github/workflows/update-pins.yml`.
 Configure the `MINIMAX_API_KEY` repository secret before enabling it. The
-workflow installs `@earendil-works/pi-coding-agent`, runs `pins-agent-ci`,
-validates the result, refuses non-`pins/*.nix` changes, then commits and pushes
-validated pin updates with `GITHUB_TOKEN`.
+workflow installs `@earendil-works/pi-coding-agent`, runs
+`tools/update-with-agent-ci.sh`, validates the result, refuses non-`pins/*.nix`
+changes, then commits and pushes validated pin updates with `GITHUB_TOKEN`.
 
 ## Validation
 
 ```sh
 nix flake check --all-systems --no-build
-nix build .#mpd-url
 nix eval .#pins.containers.home-assistant.image
 ```

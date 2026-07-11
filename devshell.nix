@@ -46,22 +46,6 @@ perSystem.devshell.mkShell {
         tools/update-pins.py validate --flake-check "$@"
       '';
     }
-    {
-      category = "updates";
-      name = "pins-agent";
-      help = "Run the pi agent-supervised pin updater";
-      command = ''
-        tools/update-with-agent.sh "$@"
-      '';
-    }
-    {
-      category = "updates";
-      name = "pins-agent-ci";
-      help = "Run the CI-safe pi updater without committing";
-      command = ''
-        tools/update-with-agent-ci.sh "$@"
-      '';
-    }
   ];
 
   packages = [

@@ -2,11 +2,11 @@
 
 ## Repo Purpose
 
-This repository is focused on maintaining personal Nix packages and manually
-tracked upstream pins that do not fit well as separate flake inputs.
+This repository is focused on maintaining manually tracked upstream pins that do
+not fit well as separate flake inputs.
 
-Service policy stays in the consuming NixOS flake. This flake carries reusable
-package definitions and centralized release metadata.
+Service policy and package wrappers stay in the consuming NixOS flake. This
+flake carries centralized release metadata and update automation.
 
 ## Dependency Update Workflow
 
@@ -37,7 +37,7 @@ and update the registry notes only if the dependency shape changed.
 
 1. Identify the dependency or dependency family in scope.
 2. Read the matching entry in the Manual Dependency Registry section.
-3. Read the relevant `pins/*.nix`, `packages/*.nix`, and `builders/*.nix` files.
+3. Read the relevant `pins/*.nix` file and any consuming wrapper if needed.
 4. Check upstream according to the documented update rule.
 5. Update the smallest coherent set of fields: version/tag/rev, URL/image, and hash.
 6. Run the lightest useful validation command from the registry.
@@ -74,8 +74,8 @@ an explicit instruction or an update-policy change.
 
 ```sh
 nix flake check
-nix build .#mpd-url
-nix build .#honcho-src
+nix eval .#pins.github.mpd-url.rev
+nix eval .#pins.github.honcho.rev
 nix eval .#pins.containers.home-assistant.image
 nix eval .#pins.containers.whoami.image
 ```
@@ -90,25 +90,13 @@ Use deterministic-only maintenance when no review is needed:
 tools/update-pins.py apply --safe --validate --flake-check --commit --push
 ```
 
-Use the agent-supervised scheduled workflow when review-required entries should
-be considered:
-
-```sh
-tools/update-with-agent.sh
-```
-
-Use the CI-safe agent wrapper in GitHub Actions. It may edit only `pins/*.nix`
+Use the CI-safe agent wrapper in GitHub Actions when review-required entries
+should be considered. It may edit only `pins/*.nix`
 and must not commit or push; the workflow owns validation, guardrails, commit,
 and push:
 
 ```sh
 tools/update-with-agent-ci.sh
-```
-
-The agent wrapper calls:
-
-```sh
-pi --model minimax/MiniMax-M3:high -p "$(<tools/update-agent-prompt.md)"
 ```
 
 The GitHub Actions workflow in `.github/workflows/update-pins.yml` expects the
@@ -133,21 +121,21 @@ policy, hash refresh behavior, and validation without repeating current versions
 
 - kind: `fetchurl-release`
 - pins: `pins/fetchurl.nix`, `citron`
-- package: `packages/citron.nix` using `builders/appimage-path.nix` via `packages.${system}.citron`
+- consumer: package wrapper lives in the consuming NixOS flake
 - upstream: https://github.com/citron-neo/CI/releases
 - update rule: use the latest acceptable Linux AppImage from the `nightly-linux` release; preserve the existing `_v3` CPU baseline unless intentionally changed
 - hash rule: after changing `url`, refresh `sha256` for the downloaded AppImage
-- validate: `nix build .#citron`
+- validate: `nix eval .#pins.fetchurl.citron.url`
 
 ### eden
 
 - kind: `fetchurl-release`
 - pins: `pins/fetchurl.nix`, `eden`
-- package: `packages/eden.nix` using `builders/appimage-path.nix` via `packages.${system}.eden`
+- consumer: package wrapper lives in the consuming NixOS flake
 - upstream: https://git.eden-emu.dev/eden-emu/eden/releases
 - update rule: use the latest acceptable Linux AppImage release; be explicit before changing RC-versus-stable policy
 - hash rule: after changing `url`, refresh `sha256` for the downloaded AppImage
-- validate: `nix build .#eden`
+- validate: `nix eval .#pins.fetchurl.eden.url`
 
 ## GitHub Sources
 
@@ -155,21 +143,21 @@ policy, hash refresh behavior, and validation without repeating current versions
 
 - kind: `fetch-github-rev`
 - pins: `pins/github.nix`, `honcho`
-- package: `packages/honcho-src.nix` using `builders/github-source.nix` via `packages.${system}.honcho-src`
+- consumer: package wrapper lives in the consuming NixOS flake
 - upstream: https://github.com/plastic-labs/honcho/releases
 - update rule: use the newest tagged release, not branch head
 - hash rule: after changing `rev`, refresh `hash` for the fetched source
-- validate: `nix build .#honcho-src`
+- validate: `nix eval .#pins.github.honcho.rev`
 
 ### mpd-url
 
 - kind: `fetch-github-rev`
 - pins: `pins/github.nix`, `mpd-url`
-- package: `packages/mpd-url.nix` using `builders/mpd-url.nix` via `packages.${system}.mpd-url`
+- consumer: package wrapper lives in the consuming NixOS flake
 - upstream: https://github.com/suderman/mpd-url
 - update rule: track the latest default-branch commit only while that remains intentional
 - hash rule: after changing `rev`, refresh `hash` for the fetched source
-- validate: `nix build .#mpd-url`
+- validate: `nix eval .#pins.github.mpd-url.rev`
 - notes: branch-based pins are higher risk than tagged releases
 
 ## Browser Extensions
@@ -178,11 +166,11 @@ policy, hash refresh behavior, and validation without repeating current versions
 
 - kind: `firefox-xpi`
 - pins: `pins/firefox.nix`, `easy-container-shortcuts`
-- package: `packages/easy-container-shortcuts.nix` using `builders/easy-container-shortcuts.nix` via `packages.${system}.easy-container-shortcuts`
+- consumer: package wrapper lives in the consuming NixOS flake
 - upstream: https://addons.mozilla.org/en-US/firefox/addon/easy-container-shortcuts/
 - update rule: use the newest stable addon release matching the existing XPI download pattern
 - hash rule: after changing `url`, refresh `sha256` for the downloaded XPI
-- validate: `nix build .#easy-container-shortcuts`
+- validate: `nix eval .#pins.firefox.easy-container-shortcuts.url`
 - notes: keep `addonId` unchanged unless upstream identity changed
 
 ### chromium-web-store

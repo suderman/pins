@@ -53,7 +53,7 @@ jobs:
       - name: Run agent updater
         run: |
           : "${NPM_CONFIG_PREFIX:?}"
-          nix develop -c bash -lc "export PATH=\"$NPM_CONFIG_PREFIX/bin:\$PATH\"; command -v pi; pins-agent-ci"
+          nix develop -c bash -lc "export PATH=\"$NPM_CONFIG_PREFIX/bin:\$PATH\"; command -v pi; tools/update-with-agent-ci.sh"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           MINIMAX_API_KEY: ${{ secrets.MINIMAX_API_KEY }}

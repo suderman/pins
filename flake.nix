@@ -1,5 +1,5 @@
 {
-  description = "Personal Nix packages and manually tracked upstream pins";
+  description = "Manually tracked upstream pins";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
@@ -21,7 +21,6 @@
   };
 
   outputs = inputs: let
-    inherit (inputs.nixpkgs) lib;
     pins = import ./pins;
     systems = [
       "x86_64-linux"
@@ -31,30 +30,8 @@
     blueprint = inputs.blueprint {
       inherit inputs systems;
     };
-
-    filterPackages = system: packages:
-      builtins.removeAttrs (lib.filterAttrs (
-          _: package: let
-            platforms = package.meta.platforms or [];
-          in
-            platforms == [] || lib.elem system platforms
-        )
-        packages) ["formatter"];
   in {
     inherit pins;
     inherit (blueprint) devShells formatter;
-
-    packages = lib.mapAttrs filterPackages blueprint.packages;
-
-    checks =
-      lib.mapAttrs (
-        _: checks: builtins.removeAttrs checks ["pkgs-formatter"]
-      )
-      blueprint.checks;
-
-    overlays.default = final: _prev: {
-      suderPins = pins;
-      suderpkgs = filterPackages final.stdenv.hostPlatform.system (blueprint.mkPackagesFor final);
-    };
   };
 }

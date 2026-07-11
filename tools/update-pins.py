@@ -86,7 +86,7 @@ ENTRIES: tuple[Entry, ...] = (
         kind="fetchurl-release",
         policy="auto",
         checker="citron-nightly",
-        validate=("nix build .#citron",),
+        validate=("nix eval .#pins.fetchurl.citron.url",),
     ),
     Entry(
         name="eden",
@@ -96,7 +96,7 @@ ENTRIES: tuple[Entry, ...] = (
         kind="fetchurl-release",
         policy="review",
         checker="unsupported",
-        validate=("nix build .#eden",),
+        validate=("nix eval .#pins.fetchurl.eden.url",),
         params={"reason": "RC-versus-stable policy requires human or agent review."},
     ),
     Entry(
@@ -107,7 +107,7 @@ ENTRIES: tuple[Entry, ...] = (
         kind="fetch-github-rev",
         policy="auto",
         checker="github-release",
-        validate=("nix build .#honcho-src",),
+        validate=("nix eval .#pins.github.honcho.rev",),
         params={"owner": "plastic-labs", "repo": "honcho", "strip_v": False},
     ),
     Entry(
@@ -118,7 +118,7 @@ ENTRIES: tuple[Entry, ...] = (
         kind="fetch-github-rev",
         policy="review",
         checker="github-default-branch",
-        validate=("nix build .#mpd-url",),
+        validate=("nix eval .#pins.github.mpd-url.rev",),
         params={"owner": "suderman", "repo": "mpd-url"},
     ),
     Entry(
@@ -129,7 +129,7 @@ ENTRIES: tuple[Entry, ...] = (
         kind="firefox-xpi",
         policy="auto",
         checker="amo-addon",
-        validate=("nix build .#easy-container-shortcuts",),
+        validate=("nix eval .#pins.firefox.easy-container-shortcuts.url",),
         params={"slug": "easy-container-shortcuts"},
     ),
     Entry(
