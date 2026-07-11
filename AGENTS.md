@@ -74,10 +74,10 @@ an explicit instruction or an update-policy change.
 
 ```sh
 nix flake check
-nix eval .#pins.github.mpd-url.rev
-nix eval .#pins.github.honcho.rev
-nix eval .#pins.containers.home-assistant.image
-nix eval .#pins.containers.whoami.image
+nix eval .#default.github.mpd-url.rev
+nix eval .#default.github.honcho.rev
+nix eval .#default.containers.home-assistant.image
+nix eval .#default.containers.whoami.image
 ```
 
 ## Automated Update Workflow
@@ -110,7 +110,7 @@ not be modified by scheduled maintenance.
 
 # Manual Dependency Registry
 
-This section documents how to update each manual dependency in `suderpkgs`.
+This section documents how to update each manual dependency in `pins`.
 
 Current pinned values live in `pins/*.nix`. This registry should describe shape,
 policy, hash refresh behavior, and validation without repeating current versions.
@@ -125,7 +125,7 @@ policy, hash refresh behavior, and validation without repeating current versions
 - upstream: https://github.com/citron-neo/CI/releases
 - update rule: use the latest acceptable Linux AppImage from the `nightly-linux` release; preserve the existing `_v3` CPU baseline unless intentionally changed
 - hash rule: after changing `url`, refresh `sha256` for the downloaded AppImage
-- validate: `nix eval .#pins.fetchurl.citron.url`
+- validate: `nix eval .#default.fetchurl.citron.url`
 
 ### eden
 
@@ -135,7 +135,7 @@ policy, hash refresh behavior, and validation without repeating current versions
 - upstream: https://git.eden-emu.dev/eden-emu/eden/releases
 - update rule: use the latest acceptable Linux AppImage release; be explicit before changing RC-versus-stable policy
 - hash rule: after changing `url`, refresh `sha256` for the downloaded AppImage
-- validate: `nix eval .#pins.fetchurl.eden.url`
+- validate: `nix eval .#default.fetchurl.eden.url`
 
 ## GitHub Sources
 
@@ -147,7 +147,7 @@ policy, hash refresh behavior, and validation without repeating current versions
 - upstream: https://github.com/plastic-labs/honcho/releases
 - update rule: use the newest tagged release, not branch head
 - hash rule: after changing `rev`, refresh `hash` for the fetched source
-- validate: `nix eval .#pins.github.honcho.rev`
+- validate: `nix eval .#default.github.honcho.rev`
 
 ### mpd-url
 
@@ -157,7 +157,7 @@ policy, hash refresh behavior, and validation without repeating current versions
 - upstream: https://github.com/suderman/mpd-url
 - update rule: track the latest default-branch commit only while that remains intentional
 - hash rule: after changing `rev`, refresh `hash` for the fetched source
-- validate: `nix eval .#pins.github.mpd-url.rev`
+- validate: `nix eval .#default.github.mpd-url.rev`
 - notes: branch-based pins are higher risk than tagged releases
 
 ## Browser Extensions
@@ -170,7 +170,7 @@ policy, hash refresh behavior, and validation without repeating current versions
 - upstream: https://addons.mozilla.org/en-US/firefox/addon/easy-container-shortcuts/
 - update rule: use the newest stable addon release matching the existing XPI download pattern
 - hash rule: after changing `url`, refresh `sha256` for the downloaded XPI
-- validate: `nix eval .#pins.firefox.easy-container-shortcuts.url`
+- validate: `nix eval .#default.firefox.easy-container-shortcuts.url`
 - notes: keep `addonId` unchanged unless upstream identity changed
 
 ### chromium-web-store
@@ -180,7 +180,7 @@ policy, hash refresh behavior, and validation without repeating current versions
 - upstream: https://github.com/NeverDecaf/chromium-web-store/releases
 - update rule: use the newest stable CRX release URL preserving the existing download pattern
 - hash rule: no inline source hash; update only `version` or `url` unless pinning changes later
-- validate: `nix eval .#pins.chromium.chromium-web-store.url`
+- validate: `nix eval .#default.chromium.chromium-web-store.url`
 
 ## Container Tags
 
@@ -196,7 +196,7 @@ Ignore floating tags such as `latest` unless the entry explicitly tracks one.
 - upstream: https://hub.docker.com/r/tessypowder/backblaze-personal-wine/tags
 - update rule: intentionally conservative; confirm image behavior before jumping far past v1.9
 - hash rule: no source hash; update tag metadata only unless digest pinning is introduced later
-- validate: `nix eval .#pins.containers.backblaze-personal-wine.image`
+- validate: `nix eval .#default.containers.backblaze-personal-wine.image`
 
 ### codex-lb
 
@@ -205,7 +205,7 @@ Ignore floating tags such as `latest` unless the entry explicitly tracks one.
 - upstream: https://github.com/Soju06/codex-lb/pkgs/container/codex-lb
 - update rule: use the newest tagged container version compatible with the consuming service module
 - hash rule: no source hash; update tag metadata only unless digest pinning is introduced later
-- validate: `nix eval .#pins.containers.codex-lb.image`
+- validate: `nix eval .#default.containers.codex-lb.image`
 
 ### home-assistant
 
@@ -214,7 +214,7 @@ Ignore floating tags such as `latest` unless the entry explicitly tracks one.
 - upstream: https://github.com/home-assistant/core/pkgs/container/home-assistant/versions?filters%5Bversion_type%5D=tagged
 - update rule: use the newest tagged container version matching the consuming repo policy
 - hash rule: no source hash; update tag metadata only unless digest pinning is introduced later
-- validate: `nix eval .#pins.containers.home-assistant.image`
+- validate: `nix eval .#default.containers.home-assistant.image`
 
 ### immich
 
@@ -223,7 +223,7 @@ Ignore floating tags such as `latest` unless the entry explicitly tracks one.
 - upstream: https://github.com/immich-app/immich/releases
 - update rule: use the newest stable tagged release unless prerelease tracking is explicitly requested
 - hash rule: no source hash; keep server, machine-learning, and CUDA image refs aligned
-- validate: `nix eval .#pins.containers.immich.serverImage`
+- validate: `nix eval .#default.containers.immich.serverImage`
 
 ### rsshub
 
@@ -232,7 +232,7 @@ Ignore floating tags such as `latest` unless the entry explicitly tracks one.
 - upstream: https://hub.docker.com/r/diygod/rsshub/tags
 - update rule: keep the `chromium-bundled` flavor unless intentionally changed
 - hash rule: no source hash; update tag metadata only unless digest pinning is introduced later
-- validate: `nix eval .#pins.containers.rsshub.image`
+- validate: `nix eval .#default.containers.rsshub.image`
 
 ### rsshub-redis
 
@@ -241,7 +241,7 @@ Ignore floating tags such as `latest` unless the entry explicitly tracks one.
 - upstream: https://hub.docker.com/_/redis/tags
 - update rule: use the newest full patch tag within the pinned Redis major/minor line compatible with RSSHub; treat major-version changes as higher risk
 - hash rule: no source hash; update tag metadata only unless digest pinning is introduced later
-- validate: `nix eval .#pins.containers.rsshub-redis.image`
+- validate: `nix eval .#default.containers.rsshub-redis.image`
 
 ### unifi
 
@@ -250,7 +250,7 @@ Ignore floating tags such as `latest` unless the entry explicitly tracks one.
 - upstream: https://hub.docker.com/r/jacobalberty/unifi/tags
 - update rule: intentionally conservative; check and report newer Docker Hub tags, but do not bump from the 7.5 controller line without explicit approval
 - hash rule: no source hash; update tag metadata only unless digest pinning is introduced later
-- validate: `nix eval .#pins.containers.unifi.image`
+- validate: `nix eval .#default.containers.unifi.image`
 
 ### whoami
 
@@ -259,7 +259,7 @@ Ignore floating tags such as `latest` unless the entry explicitly tracks one.
 - upstream: https://hub.docker.com/r/traefik/whoami/tags
 - update rule: use the newest full semver tag; ignore `latest` and arch-specific tags such as `*-amd64`, `*-arm64`, and `*-armv7`
 - hash rule: no source hash; update tag metadata only unless digest pinning is introduced later
-- validate: `nix eval .#pins.containers.whoami.image`
+- validate: `nix eval .#default.containers.whoami.image`
 
 ### whoogle-search
 
@@ -268,7 +268,7 @@ Ignore floating tags such as `latest` unless the entry explicitly tracks one.
 - upstream: https://github.com/benbusby/whoogle-search/releases
 - update rule: use the newest tagged release compatible with the consuming service module
 - hash rule: no source hash; update tag metadata only unless digest pinning is introduced later
-- validate: `nix eval .#pins.containers.whoogle-search.image`
+- validate: `nix eval .#default.containers.whoogle-search.image`
 
 ### zwave-js-ui
 
@@ -277,4 +277,4 @@ Ignore floating tags such as `latest` unless the entry explicitly tracks one.
 - upstream: https://github.com/zwave-js/zwave-js-ui/pkgs/container/zwave-js-ui/versions?filters%5Bversion_type%5D=tagged
 - update rule: use the newest tagged container version matching the Home Assistant module expectations
 - hash rule: no source hash; update tag metadata only unless digest pinning is introduced later
-- validate: `nix eval .#pins.containers.zwave-js-ui.image`
+- validate: `nix eval .#default.containers.zwave-js-ui.image`

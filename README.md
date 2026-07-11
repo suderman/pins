@@ -1,4 +1,4 @@
-# suderpkgs
+# pins
 
 Manually tracked upstream pins that do not fit well as separate flake inputs.
 
@@ -11,11 +11,12 @@ pin maintenance commands.
 
 ## Outputs
 
-- `pins.containers`
-- `pins.fetchurl`
-- `pins.firefox`
-- `pins.github`
-- `pins.chromium`
+- `default.containers`
+- `default.fetchurl`
+- `default.firefox`
+- `default.github`
+- `default.chromium`
+- `pins.*` as an explicit alias for `default`
 - `devShells.${system}.default`
 - `formatter.${system}`
 
@@ -25,8 +26,8 @@ Add this flake once:
 
 ```nix
 {
-  inputs.suderpkgs = {
-    url = "github:suderman/suderpkgs";
+  inputs.pins = {
+    url = "github:suderman/pins";
     inputs.nixpkgs.follows = "nixpkgs";
   };
 }
@@ -35,17 +36,17 @@ Add this flake once:
 Use centralized image/tag metadata without importing a package set:
 
 ```nix
-flake.inputs.suderpkgs.pins.containers.home-assistant.image
-flake.inputs.suderpkgs.pins.containers.immich.serverImage
-flake.inputs.suderpkgs.pins.containers.whoami.image
-flake.inputs.suderpkgs.pins.containers.zwave-js-ui.version
+flake.inputs.pins.default.containers.home-assistant.image
+flake.inputs.pins.default.containers.immich.serverImage
+flake.inputs.pins.default.containers.whoami.image
+flake.inputs.pins.default.containers.zwave-js-ui.version
 ```
 
 Use pinned source metadata for local package wrappers in the consuming flake:
 
 ```nix
-flake.inputs.suderpkgs.pins.github.honcho.rev
-flake.inputs.suderpkgs.pins.github.honcho.hash
+flake.inputs.pins.default.github.honcho.rev
+flake.inputs.pins.default.github.honcho.hash
 ```
 
 ## Pin Policy
@@ -97,5 +98,5 @@ changes, then commits and pushes validated pin updates with `GITHUB_TOKEN`.
 
 ```sh
 nix flake check --all-systems --no-build
-nix eval .#pins.containers.home-assistant.image
+nix eval .#default.containers.home-assistant.image
 ```

@@ -4,11 +4,6 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
 
-    # Map folder structure to flake outputs.
-    # <https://github.com/numtide/blueprint>
-    blueprint.url = "github:numtide/blueprint";
-    blueprint.inputs.nixpkgs.follows = "nixpkgs";
-
     # Code formatting.
     # <https://github.com/numtide/treefmt-nix>
     treefmt-nix.url = "github:numtide/treefmt-nix";
@@ -21,17 +16,39 @@
   };
 
   outputs = inputs: let
+    inherit (inputs.nixpkgs) lib;
+
     pins = import ./pins;
     systems = [
       "x86_64-linux"
       "aarch64-linux"
     ];
 
-    blueprint = inputs.blueprint {
-      inherit inputs systems;
-    };
+    forAllSystems = lib.genAttrs systems;
+
+    pkgsFor = system:
+      import inputs.nixpkgs {
+        inherit system;
+      };
+
+    formatterFor = pkgs: let
+      treefmtEval = inputs.treefmt-nix.lib.evalModule pkgs ./treefmt.nix;
+    in
+      treefmtEval.config.build.wrapper;
   in {
+    default = pins;
     inherit pins;
-    inherit (blueprint) devShells formatter;
+
+    formatter = forAllSystems (system: formatterFor (pkgsFor system));
+
+    devShells = forAllSystems (system: let
+      pkgs = pkgsFor system;
+      formatter = formatterFor pkgs;
+      devshell = inputs.devshell.legacyPackages.${system};
+    in {
+      default = import ./devshell.nix {
+        inherit devshell formatter pkgs;
+      };
+    });
   };
 }

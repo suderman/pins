@@ -1,4 +1,4 @@
-You are updating `/home/jon/src/suderman/suderpkgs` in GitHub Actions.
+You are updating `suderman/pins` in GitHub Actions.
 
 Use the deterministic updater first and leave a scoped working-tree diff for the
 workflow to validate, commit, and push.

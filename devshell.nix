@@ -1,10 +1,11 @@
 {
+  devshell,
+  formatter,
   pkgs,
-  perSystem,
   ...
 }:
-perSystem.devshell.mkShell {
-  devshell.name = "suderman/suderpkgs";
+devshell.mkShell {
+  devshell.name = "suderman/pins";
 
   env = [
     {
@@ -53,6 +54,6 @@ perSystem.devshell.mkShell {
     pkgs.nix
     pkgs.nodejs
     pkgs.python3
-    perSystem.self.formatter
+    formatter
   ];
 }

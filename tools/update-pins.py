@@ -24,7 +24,7 @@ from typing import Any
 
 
 ROOT = Path(__file__).resolve().parents[1]
-USER_AGENT = "suderpkgs-update-pins/1.0"
+USER_AGENT = "pins-update/1.0"
 PIN_FILES = {
     "chromium": "pins/chromium.nix",
     "containers": "pins/containers.nix",
@@ -86,7 +86,7 @@ ENTRIES: tuple[Entry, ...] = (
         kind="fetchurl-release",
         policy="auto",
         checker="citron-nightly",
-        validate=("nix eval .#pins.fetchurl.citron.url",),
+        validate=("nix eval .#default.fetchurl.citron.url",),
     ),
     Entry(
         name="eden",
@@ -96,7 +96,7 @@ ENTRIES: tuple[Entry, ...] = (
         kind="fetchurl-release",
         policy="review",
         checker="unsupported",
-        validate=("nix eval .#pins.fetchurl.eden.url",),
+        validate=("nix eval .#default.fetchurl.eden.url",),
         params={"reason": "RC-versus-stable policy requires human or agent review."},
     ),
     Entry(
@@ -107,7 +107,7 @@ ENTRIES: tuple[Entry, ...] = (
         kind="fetch-github-rev",
         policy="auto",
         checker="github-release",
-        validate=("nix eval .#pins.github.honcho.rev",),
+        validate=("nix eval .#default.github.honcho.rev",),
         params={"owner": "plastic-labs", "repo": "honcho", "strip_v": False},
     ),
     Entry(
@@ -118,7 +118,7 @@ ENTRIES: tuple[Entry, ...] = (
         kind="fetch-github-rev",
         policy="review",
         checker="github-default-branch",
-        validate=("nix eval .#pins.github.mpd-url.rev",),
+        validate=("nix eval .#default.github.mpd-url.rev",),
         params={"owner": "suderman", "repo": "mpd-url"},
     ),
     Entry(
@@ -129,7 +129,7 @@ ENTRIES: tuple[Entry, ...] = (
         kind="firefox-xpi",
         policy="auto",
         checker="amo-addon",
-        validate=("nix eval .#pins.firefox.easy-container-shortcuts.url",),
+        validate=("nix eval .#default.firefox.easy-container-shortcuts.url",),
         params={"slug": "easy-container-shortcuts"},
     ),
     Entry(
@@ -140,7 +140,7 @@ ENTRIES: tuple[Entry, ...] = (
         kind="manual-version",
         policy="auto",
         checker="github-release",
-        validate=("nix eval .#pins.chromium.chromium-web-store.url",),
+        validate=("nix eval .#default.chromium.chromium-web-store.url",),
         params={"owner": "NeverDecaf", "repo": "chromium-web-store", "strip_v": True},
     ),
     Entry(
@@ -151,7 +151,7 @@ ENTRIES: tuple[Entry, ...] = (
         kind="container-tag",
         policy="report",
         checker="dockerhub-semver",
-        validate=("nix eval .#pins.containers.backblaze-personal-wine.image",),
+        validate=("nix eval .#default.containers.backblaze-personal-wine.image",),
         params={"namespace": "tessypowder", "repo": "backblaze-personal-wine", "strip_v": True},
     ),
     Entry(
@@ -162,7 +162,7 @@ ENTRIES: tuple[Entry, ...] = (
         kind="container-tag",
         policy="review",
         checker="github-container",
-        validate=("nix eval .#pins.containers.codex-lb.image",),
+        validate=("nix eval .#default.containers.codex-lb.image",),
         params={"owner_kind": "users", "owner": "Soju06", "package": "codex-lb", "strip_v": False},
     ),
     Entry(
@@ -173,7 +173,7 @@ ENTRIES: tuple[Entry, ...] = (
         kind="container-tag",
         policy="auto",
         checker="github-release",
-        validate=("nix eval .#pins.containers.home-assistant.image",),
+        validate=("nix eval .#default.containers.home-assistant.image",),
         params={"owner": "home-assistant", "repo": "core", "strip_v": False},
     ),
     Entry(
@@ -184,7 +184,7 @@ ENTRIES: tuple[Entry, ...] = (
         kind="manual-version",
         policy="auto",
         checker="github-release",
-        validate=("nix eval .#pins.containers.immich.serverImage",),
+        validate=("nix eval .#default.containers.immich.serverImage",),
         params={"owner": "immich-app", "repo": "immich", "strip_v": True},
     ),
     Entry(
@@ -195,7 +195,7 @@ ENTRIES: tuple[Entry, ...] = (
         kind="container-tag",
         policy="report",
         checker="unsupported",
-        validate=("nix eval .#pins.containers.rsshub.image",),
+        validate=("nix eval .#default.containers.rsshub.image",),
         params={"reason": "chromium-bundled is an intentionally preserved flavor tag."},
     ),
     Entry(
@@ -206,7 +206,7 @@ ENTRIES: tuple[Entry, ...] = (
         kind="container-tag",
         policy="auto",
         checker="dockerhub-semver",
-        validate=("nix eval .#pins.containers.rsshub-redis.image",),
+        validate=("nix eval .#default.containers.rsshub-redis.image",),
         params={
             "namespace": "library",
             "repo": "redis",
@@ -222,7 +222,7 @@ ENTRIES: tuple[Entry, ...] = (
         kind="container-tag",
         policy="report",
         checker="dockerhub-semver",
-        validate=("nix eval .#pins.containers.unifi.image",),
+        validate=("nix eval .#default.containers.unifi.image",),
         params={"namespace": "jacobalberty", "repo": "unifi", "strip_v": True},
     ),
     Entry(
@@ -233,7 +233,7 @@ ENTRIES: tuple[Entry, ...] = (
         kind="container-tag",
         policy="auto",
         checker="dockerhub-semver",
-        validate=("nix eval .#pins.containers.whoami.image",),
+        validate=("nix eval .#default.containers.whoami.image",),
         params={
             "namespace": "traefik",
             "repo": "whoami",
@@ -250,7 +250,7 @@ ENTRIES: tuple[Entry, ...] = (
         kind="container-tag",
         policy="auto",
         checker="github-release",
-        validate=("nix eval .#pins.containers.whoogle-search.image",),
+        validate=("nix eval .#default.containers.whoogle-search.image",),
         params={"owner": "benbusby", "repo": "whoogle-search", "strip_v": True},
     ),
     Entry(
@@ -261,7 +261,7 @@ ENTRIES: tuple[Entry, ...] = (
         kind="container-tag",
         policy="auto",
         checker="github-release",
-        validate=("nix eval .#pins.containers.zwave-js-ui.image",),
+        validate=("nix eval .#default.containers.zwave-js-ui.image",),
         params={"owner": "zwave-js", "repo": "zwave-js-ui", "strip_v": True},
     ),
 )
@@ -367,7 +367,7 @@ def select_entries(names: list[str] | None) -> tuple[Entry, ...]:
 
 
 def load_pins() -> dict[str, Any]:
-    completed = run(["nix", "eval", "--json", ".#pins"], capture=True)
+    completed = run(["nix", "eval", "--json", ".#default"], capture=True)
     return json.loads(completed.stdout)
 
 
@@ -856,7 +856,7 @@ def json_report(results: list[Result]) -> str:
 
 def markdown_report(results: list[Result]) -> str:
     lines = [
-        "# suderpkgs update report",
+        "# pins update report",
         "",
         f"Generated: {datetime.now(timezone.utc).isoformat()}",
         "",
@@ -901,7 +901,7 @@ def human_report(results: list[Result]) -> str:
     ]
     up_to_date = [result.name for result in results if result.action == "up-to-date"]
 
-    lines = ["suderpkgs update check"]
+    lines = ["pins update check"]
     wrote_section = False
     for title, section_results in sections:
         if not section_results:
