@@ -1,24 +1,15 @@
-# pins
+# suderman/pins 📌
 
-Manually tracked upstream pins that do not fit well as separate flake inputs.
-
-This repo is intentionally small. Service policy stays in the consuming NixOS
-flake; package wrappers stay there too. This flake carries centralized release
-metadata and update automation.
-
-This flake uses `treefmt-nix` for formatting and a small development shell for
-pin maintenance commands.
+A curated pinboard for upstream versions that need judgment, policy, or metadata beyond `flake.lock`
 
 ## Outputs
 
-- `default.containers`
-- `default.fetchurl`
-- `default.firefox`
-- `default.github`
-- `default.chromium`
-- `pins.*` as an explicit alias for `default`
-- `devShells.${system}.default`
+- `default`: the pin registry
+- `pins`: alias for `default`
+- `devShells.${system}.default`: maintenance shell
 - `formatter.${system}`
+
+Pin groups currently include `containers`, `fetchurl`, `firefox`, `github`, and `chromium`.
 
 ## Consuming
 
@@ -33,66 +24,41 @@ Add this flake once:
 }
 ```
 
-Use centralized image/tag metadata without importing a package set:
+Read pin metadata directly from default:
 
 ```nix
 flake.inputs.pins.default.containers.home-assistant.image
 flake.inputs.pins.default.containers.immich.serverImage
-flake.inputs.pins.default.containers.whoami.image
-flake.inputs.pins.default.containers.zwave-js-ui.version
-```
-
-Use pinned source metadata for local package wrappers in the consuming flake:
-
-```nix
 flake.inputs.pins.default.github.honcho.rev
 flake.inputs.pins.default.github.honcho.hash
 ```
 
+Package wrappers, service policy, and host-specific decisions stay in the consuming flake.
+
 ## Pin Policy
 
-Current versions live in `pins/*.nix`. Do not duplicate current values in prose
-unless there is a strong reason; prose drifts faster than Nix data.
+Current values live in `pins/*.nix`; prose should describe policy, not repeat versions.
 
-The root `AGENTS.md` file documents how to check each upstream, what counts as
-an acceptable update, and how to validate a change.
+`AGENTS.md` documents each pin’s upstream source, update policy, hash refresh rule, and validation command. Scheduled maintenance updates only explicit versions, tags, URLs, revisions, and hashes. Floating tags such as `latest` are avoided unless a registry entry explicitly allows them.
 
-For scheduled maintenance, check every entry under the registry's container tag
-section against its upstream URL/API. Update only specific tags, not floating
-tags such as `latest`.
+## Updating
 
-## Updating Pins
-
-Enter the development shell with `direnv allow` or `nix develop`. It exposes:
+Enter the shell with `direnv allow` or `nix develop`. 
 
 - `pins-check`
 - `pins-report`
 - `pins-apply-safe`
 - `pins-validate`
 
-The commands wrap the scripts below and accept the same extra arguments.
-
-Run the deterministic updater to check upstreams without editing files. The
-default output is a concise terminal summary:
-
-```sh
-tools/update-pins.py check
-```
-
-Use `pins-report` or `tools/update-pins.py report` for a Markdown table, and
-`--format json` when full upstream error details are needed.
+Use `pins-check` for a concise read-only upstream check, `pins-report` for Markdown, and `--format json` when full upstream error details are needed.
 
 Apply safe deterministic updates, validate, commit, and push:
 
 ```sh
-tools/update-pins.py apply --safe --validate --flake-check --commit --push
+pins-apply-safe
 ```
 
-GitHub Actions scheduled maintenance uses `.github/workflows/update-pins.yml`.
-Configure the `MINIMAX_API_KEY` repository secret before enabling it. The
-workflow installs `@earendil-works/pi-coding-agent`, runs
-`tools/update-with-agent-ci.sh`, validates the result, refuses non-`pins/*.nix`
-changes, then commits and pushes validated pin updates with `GITHUB_TOKEN`.
+GitHub Actions runs `.github/workflows/update-pins.yml` on schedule. It requires `MINIMAX_API_KEY`, runs `tools/update-with-agent-ci.sh`, validates the diff, refuses `non-pins/*.nix` changes, then commits and pushes with `GITHUB_TOKEN`.
 
 ## Validation
 
