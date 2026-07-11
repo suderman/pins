@@ -1,0 +1,90 @@
+name: update pins
+
+on:
+  schedule:
+    - cron: "17 10 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-pins
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    env:
+      NPM_CONFIG_PREFIX: ${{ runner.temp }}/npm-global
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install pi coding agent
+        run: |
+          mkdir -p "$NPM_CONFIG_PREFIX"
+          npm install -g --ignore-scripts @earendil-works/pi-coding-agent
+          echo "$NPM_CONFIG_PREFIX/bin" >>"$GITHUB_PATH"
+          export PATH="$NPM_CONFIG_PREFIX/bin:$PATH"
+          command -v pi
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Check pins
+        run: nix develop -c pins-check
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run agent updater
+        run: |
+          nix develop -c bash -lc 'export PATH="$NPM_CONFIG_PREFIX/bin:$PATH"; command -v pi; pins-agent-ci'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MINIMAX_API_KEY: ${{ secrets.MINIMAX_API_KEY }}
+
+      - name: Validate changes
+        run: nix develop -c pins-validate
+
+      - name: Guard changed files
+        id: guard
+        run: |
+          status="$(git status --porcelain)"
+          if [ -z "$status" ]; then
+            echo "No changes."
+            echo "changed=false" >>"$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          bad="$(printf '%s\n' "$status" | grep -Ev '^...pins/[^/]+\.nix$' || true)"
+          if [ -n "$bad" ]; then
+            echo "Refusing to commit non-pin changes:"
+            printf '%s\n' "$bad"
+            exit 1
+          fi
+
+          paths="$(printf '%s\n' "$status" | sed -E 's/^...//')"
+          echo "Changed pin files:"
+          printf '%s\n' "$paths"
+          echo "changed=true" >>"$GITHUB_OUTPUT"
+
+      - name: Commit and push
+        if: steps.guard.outputs.changed == 'true'
+        run: |
+          git add pins
+          git commit -m "chore: update manual dependency pins"
+          git push

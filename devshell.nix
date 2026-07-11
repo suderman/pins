@@ -54,11 +54,20 @@ perSystem.devshell.mkShell {
         tools/update-with-agent.sh "$@"
       '';
     }
+    {
+      category = "updates";
+      name = "pins-agent-ci";
+      help = "Run the CI-safe pi updater without committing";
+      command = ''
+        tools/update-with-agent-ci.sh "$@"
+      '';
+    }
   ];
 
   packages = [
     pkgs.git
     pkgs.nix
+    pkgs.nodejs
     pkgs.python3
     perSystem.self.formatter
   ];

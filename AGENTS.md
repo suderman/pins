@@ -97,11 +97,23 @@ be considered:
 tools/update-with-agent.sh
 ```
 
+Use the CI-safe agent wrapper in GitHub Actions. It may edit only `pins/*.nix`
+and must not commit or push; the workflow owns validation, guardrails, commit,
+and push:
+
+```sh
+tools/update-with-agent-ci.sh
+```
+
 The agent wrapper calls:
 
 ```sh
 pi --model minimax/MiniMax-M3:high -p "$(<tools/update-agent-prompt.md)"
 ```
+
+The GitHub Actions workflow in `.github/workflows/update-pins.yml` expects the
+`MINIMAX_API_KEY` repository secret to be configured. It installs the npm
+package `@earendil-works/pi-coding-agent` before running the CI-safe wrapper.
 
 The updater may automatically modify only entries marked as safe in its internal
 registry. Review-required entries must be selected explicitly with

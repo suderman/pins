@@ -88,6 +88,7 @@ Enter the development shell with `direnv allow` or `nix develop`. It exposes:
 - `pins-apply-safe`
 - `pins-validate`
 - `pins-agent`
+- `pins-agent-ci`
 
 The commands wrap the scripts below and accept the same extra arguments.
 
@@ -116,6 +117,12 @@ tools/update-with-agent.sh
 The agent wrapper uses the local `pi` coding-agent harness with
 `minimax/MiniMax-M3:high`, so it is intended for hosts where those credentials
 are already configured.
+
+GitHub Actions scheduled maintenance uses `.github/workflows/update-pins.yml`.
+Configure the `MINIMAX_API_KEY` repository secret before enabling it. The
+workflow installs `@earendil-works/pi-coding-agent`, runs `pins-agent-ci`,
+validates the result, refuses non-`pins/*.nix` changes, then commits and pushes
+validated pin updates with `GITHUB_TOKEN`.
 
 ## Validation
 
