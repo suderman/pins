@@ -43,7 +43,7 @@ Current values live in `pins/*.nix`; prose should describe policy, not repeat ve
 
 ## Updating
 
-Enter the shell with `direnv allow` or `nix develop`. 
+Enter the shell with `direnv allow` or `nix develop`.
 
 - `pins-check`
 - `pins-report`
