@@ -8,14 +8,14 @@
   };
 
   codex-lb = rec {
-    version = "1.21.0";
+    version = "1.22.0";
     ref = version;
     image = "ghcr.io/soju06/codex-lb:${ref}";
     upstream = "https://github.com/Soju06/codex-lb/pkgs/container/codex-lb";
   };
 
   home-assistant = rec {
-    version = "2026.7.3";
+    version = "2026.7.4";
     ref = version;
     image = "ghcr.io/home-assistant/home-assistant:${ref}";
     upstream = "https://github.com/home-assistant/core/pkgs/container/home-assistant/versions?filters%5Bversion_type%5D=tagged";
