@@ -22,7 +22,7 @@
   };
 
   immich = rec {
-    version = "3.0.3";
+    version = "3.1.0";
     ref = version;
     serverImage = "ghcr.io/immich-app/immich-server:v${ref}";
     machineLearningImage = "ghcr.io/immich-app/immich-machine-learning:v${ref}";
@@ -55,7 +55,7 @@
   };
 
   whoami = rec {
-    version = "1.11.0";
+    version = "1.12.0";
     ref = version;
     image = "traefik/whoami:v${ref}";
     upstream = "https://hub.docker.com/r/traefik/whoami/tags";
