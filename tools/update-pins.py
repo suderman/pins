@@ -10,11 +10,14 @@ from __future__ import annotations
 
 import argparse
 import dataclasses
+import io
 import json
 import os
 import re
 import subprocess
 import sys
+import tarfile
+import tempfile
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -31,6 +34,7 @@ PIN_FILES = {
     "fetchurl": "pins/fetchurl.nix",
     "firefox": "pins/firefox.nix",
     "github": "pins/github.nix",
+    "npm": "pins/npm.nix",
 }
 
 
@@ -142,6 +146,17 @@ ENTRIES: tuple[Entry, ...] = (
         checker="github-release",
         validate=("nix eval .#default.chromium.chromium-web-store.url",),
         params={"owner": "NeverDecaf", "repo": "chromium-web-store", "strip_v": True},
+    ),
+    Entry(
+        name="hrvst-cli",
+        group="npm",
+        pin_name="hrvst-cli",
+        value_field="version",
+        kind="npm-package",
+        policy="auto",
+        checker="npm-latest",
+        validate=("nix eval .#default.npm.hrvst-cli.version",),
+        params={"package": "hrvst-cli", "lock_file": "pins/npm/hrvst-cli/package-lock.json"},
     ),
     Entry(
         name="backblaze-personal-wine",
@@ -489,7 +504,7 @@ def apply_entries(
             if not fields:
                 results.append(result)
                 continue
-            fields = refresh_hash_fields(entry, fields)
+            fields = refresh_hash_fields(entry, fields, current_pin)
             replace_pin_fields(ROOT / entry.file, entry.pin_name, fields)
             results.append(
                 Result(
@@ -547,6 +562,8 @@ def find_candidate(entry: Entry, current: str, current_pin: dict[str, Any]) -> C
         return citron_nightly_candidate()
     if checker == "amo-addon":
         return amo_addon_candidate(entry, current_pin)
+    if checker == "npm-latest":
+        return npm_latest_candidate(entry, current)
     raise UpdateError(f"unknown checker {checker!r} for {entry.name}")
 
 
@@ -720,7 +737,34 @@ def amo_addon_candidate(entry: Entry, current_pin: dict[str, Any]) -> Candidate:
     return Candidate(value=version, fields={"url": file_url}, source=data.get("url"), reason=f"AMO current version is {version}")
 
 
-def refresh_hash_fields(entry: Entry, fields: dict[str, str]) -> dict[str, str]:
+def npm_latest_candidate(entry: Entry, current: str) -> Candidate:
+    package = entry.params["package"]
+    encoded_package = urllib.parse.quote(package, safe="@")
+    data = http_json(
+        f"https://registry.npmjs.org/{encoded_package}",
+        headers={"Accept": "application/vnd.npm.install-v1+json"},
+    )
+    version = str(data.get("dist-tags", {}).get("latest") or "")
+    release = data.get("versions", {}).get(version, {})
+    dist = release.get("dist", {})
+    url = str(dist.get("tarball") or "")
+    integrity = str(dist.get("integrity") or "")
+    if not version or not url or not integrity:
+        return Candidate(value=None, reason=f"npm did not report a complete latest release for {package}")
+    reason = "current pin matches npm latest" if version == current else f"npm latest is {version}"
+    return Candidate(
+        value=version,
+        fields={"url": url, "hash": integrity},
+        source=f"https://www.npmjs.com/package/{package}",
+        reason=reason,
+    )
+
+
+def refresh_hash_fields(
+    entry: Entry,
+    fields: dict[str, str],
+    current_pin: dict[str, Any],
+) -> dict[str, str]:
     fields = dict(fields)
     if entry.group in {"fetchurl", "firefox"} and "url" in fields:
         fields["sha256"] = prefetch_file_hash(fields["url"])
@@ -728,7 +772,38 @@ def refresh_hash_fields(entry: Entry, fields: dict[str, str]) -> dict[str, str]:
         owner = entry.params["owner"]
         repo = entry.params["repo"]
         fields["hash"] = prefetch_github_source_hash(owner, repo, fields[entry.value_field])
+    if entry.group == "npm" and entry.value_field in fields:
+        fields["npmDepsHash"] = refresh_npm_lock(entry, fields.get("url", current_pin["url"]))
     return fields
+
+
+def refresh_npm_lock(entry: Entry, url: str) -> str:
+    lock_path = ROOT / entry.params["lock_file"]
+    with tempfile.TemporaryDirectory(prefix=f"pins-{entry.name}-") as temp_dir_name:
+        temp_dir = Path(temp_dir_name)
+        request = urllib.request.Request(url, headers=http_headers(url))
+        try:
+            with urllib.request.urlopen(request, timeout=60) as response:  # noqa: S310 - npm registry URL.
+                tarball = response.read()
+        except (urllib.error.HTTPError, urllib.error.URLError) as error:
+            raise UpdateError(f"failed to download npm tarball {url}: {error}") from error
+
+        with tarfile.open(fileobj=io.BytesIO(tarball), mode="r:gz") as archive:
+            package_json = archive.extractfile("package/package.json")
+            if package_json is None:
+                raise UpdateError(f"npm tarball for {entry.name} has no package/package.json")
+            (temp_dir / "package.json").write_bytes(package_json.read())
+
+        run(
+            ["npm", "install", "--package-lock-only", "--ignore-scripts", "--no-audit", "--no-fund"],
+            cwd=temp_dir,
+        )
+        generated_lock = temp_dir / "package-lock.json"
+        completed = run(["prefetch-npm-deps", str(generated_lock)], capture=True, cwd=temp_dir)
+        npm_deps_hash = completed.stdout.strip().splitlines()[-1]
+        lock_path.parent.mkdir(parents=True, exist_ok=True)
+        lock_path.write_bytes(generated_lock.read_bytes())
+        return npm_deps_hash
 
 
 def prefetch_file_hash(url: str) -> str:
@@ -789,6 +864,8 @@ def validate_entries(entries: tuple[Entry, ...], *, flake_check: bool) -> None:
     run(["git", "diff", "--check"])
     commands = []
     for entry in entries:
+        if entry.group == "npm":
+            validate_npm_lock(entry)
         commands.extend(entry.validate)
     if flake_check:
         commands.append("nix flake check --no-build")
@@ -797,10 +874,25 @@ def validate_entries(entries: tuple[Entry, ...], *, flake_check: bool) -> None:
         run_shell(command)
 
 
+def validate_npm_lock(entry: Entry) -> None:
+    lock_path = ROOT / entry.params["lock_file"]
+    actual = run(["prefetch-npm-deps", str(lock_path)], capture=True).stdout.strip().splitlines()[-1]
+    expected = run(
+        ["nix", "eval", "--raw", f".#default.npm.{entry.pin_name}.npmDepsHash"],
+        capture=True,
+    ).stdout.strip()
+    if actual != expected:
+        raise UpdateError(f"npmDepsHash mismatch for {entry.name}: expected {expected}, got {actual}")
+
+
 def changed_entries_from_git() -> tuple[Entry, ...]:
     completed = run(["git", "diff", "--name-only"], capture=True)
     changed = set(completed.stdout.splitlines())
-    return tuple(entry for entry in ENTRIES if entry.file in changed)
+    return tuple(
+        entry
+        for entry in ENTRIES
+        if entry.file in changed or entry.params.get("lock_file") in changed
+    )
 
 
 def commit_changed_pin_files(*, push: bool, message: str = "chore: update manual dependency pins") -> None:
@@ -810,7 +902,9 @@ def commit_changed_pin_files(*, push: bool, message: str = "chore: update manual
         print("no changes to commit")
         return
 
-    allowed = set(PIN_FILES.values())
+    allowed = set(PIN_FILES.values()) | {
+        entry.params["lock_file"] for entry in ENTRIES if "lock_file" in entry.params
+    }
     changed_paths = {parse_status_path(line) for line in status_lines}
     disallowed = sorted(path for path in changed_paths if path not in allowed)
     if disallowed:
@@ -981,11 +1075,16 @@ def http_headers(url: str) -> dict[str, str]:
     return headers
 
 
-def run(command: list[str], *, capture: bool = False) -> subprocess.CompletedProcess[str]:
+def run(
+    command: list[str],
+    *,
+    capture: bool = False,
+    cwd: Path = ROOT,
+) -> subprocess.CompletedProcess[str]:
     try:
         return subprocess.run(
             command,
-            cwd=ROOT,
+            cwd=cwd,
             check=True,
             text=True,
             stdout=subprocess.PIPE if capture else None,

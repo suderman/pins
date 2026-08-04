@@ -53,6 +53,7 @@ devshell.mkShell {
     pkgs.git
     pkgs.nix
     pkgs.nodejs
+    pkgs.prefetch-npm-deps
     pkgs.python3
     formatter
   ];

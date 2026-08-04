@@ -71,7 +71,7 @@ jobs:
             exit 0
           fi
 
-          bad="$(printf '%s\n' "$status" | grep -Ev '^...pins/[^/]+\.nix$' || true)"
+          bad="$(printf '%s\n' "$status" | grep -Ev '^...pins/([^/]+\.nix|npm/[^/]+/package-lock\.json)$' || true)"
           if [ -n "$bad" ]; then
             echo "Refusing to commit non-pin changes:"
             printf '%s\n' "$bad"

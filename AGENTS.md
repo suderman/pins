@@ -20,6 +20,7 @@ Examples include:
 - `pins/github.nix` `fetchFromGitHub` revisions and hashes
 - `pins/firefox.nix` XPI URLs and hashes
 - `pins/chromium.nix` CRX release URLs
+- `pins/npm.nix` npm release metadata, dependency hashes, and generated lockfiles
 
 ## Required Registry
 
@@ -76,6 +77,7 @@ an explicit instruction or an update-policy change.
 nix flake check
 nix eval .#default.github.mpd-url.rev
 nix eval .#default.github.honcho.rev
+nix eval .#default.npm.hrvst-cli.version
 nix eval .#default.containers.home-assistant.image
 nix eval .#default.containers.whoami.image
 ```
@@ -181,6 +183,18 @@ policy, hash refresh behavior, and validation without repeating current versions
 - update rule: use the newest stable CRX release URL preserving the existing download pattern
 - hash rule: no inline source hash; update only `version` or `url` unless pinning changes later
 - validate: `nix eval .#default.chromium.chromium-web-store.url`
+
+## npm Packages
+
+### hrvst-cli
+
+- kind: `npm-package`
+- pins: `pins/npm.nix`, `hrvst-cli`; generated lockfile: `pins/npm/hrvst-cli/package-lock.json`
+- consumer: package wrapper lives in the consuming NixOS flake
+- upstream: https://www.npmjs.com/package/hrvst-cli
+- update rule: use the version selected by npm's `latest` dist-tag
+- hash rule: use the registry tarball integrity, regenerate `package-lock.json` from the published package metadata, and refresh `npmDepsHash` with `prefetch-npm-deps`
+- validate: `nix eval .#default.npm.hrvst-cli.version`
 
 ## Container Tags
 

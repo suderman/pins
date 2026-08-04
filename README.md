@@ -9,7 +9,7 @@ A curated pinboard for upstream versions that need judgment, policy, or metadata
 - `devShells.${system}.default`: maintenance shell
 - `formatter.${system}`
 
-Pin groups currently include `containers`, `fetchurl`, `firefox`, `github`, and `chromium`.
+Pin groups currently include `chromium`, `containers`, `fetchurl`, `firefox`, `github`, and `npm`.
 
 ## Consuming
 
@@ -31,6 +31,7 @@ flake.inputs.pins.default.containers.home-assistant.image
 flake.inputs.pins.default.containers.immich.serverImage
 flake.inputs.pins.default.github.honcho.rev
 flake.inputs.pins.default.github.honcho.hash
+flake.inputs.pins.default.npm.hrvst-cli.packageLock
 ```
 
 Package wrappers, service policy, and host-specific decisions stay in the consuming flake.

@@ -4,4 +4,5 @@
   fetchurl = import ./fetchurl.nix;
   firefox = import ./firefox.nix;
   github = import ./github.nix;
+  npm = import ./npm.nix;
 }
