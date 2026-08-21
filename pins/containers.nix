@@ -39,7 +39,7 @@
   };
 
   rsshub-redis = rec {
-    tag = "6.2.23";
+    tag = "6.2.24";
     ref = tag;
     image = "redis:${ref}";
     upstream = "https://hub.docker.com/_/redis/tags";
