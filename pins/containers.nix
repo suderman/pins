@@ -8,7 +8,7 @@
   };
 
   codex-lb = rec {
-    version = "1.23.0";
+    version = "1.24.0";
     ref = version;
     image = "ghcr.io/soju06/codex-lb:${ref}";
     upstream = "https://github.com/Soju06/codex-lb/pkgs/container/codex-lb";

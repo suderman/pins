@@ -2,8 +2,8 @@
   honcho = {
     owner = "plastic-labs";
     repo = "honcho";
-    rev = "v3.0.12";
-    hash = "sha256-BekiGw5l1eTGbCtGrOcPeJHk/ckJ9pmBJ7r8YXNIMGM=";
+    rev = "v3.1.0";
+    hash = "sha256-kijz8Fr+ZnSgvG5Mvmpko92k6qRiBL9sNzzljwzKwpg=";
     upstream = "https://github.com/plastic-labs/honcho/releases";
     updatePolicy = "Track tagged releases, not branch heads.";
   };
