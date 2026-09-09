@@ -162,6 +162,17 @@ policy, hash refresh behavior, and validation without repeating current versions
 - validate: `nix eval .#default.github.mpd-url.rev`
 - notes: branch-based pins are higher risk than tagged releases
 
+### nojoin
+
+- kind: `github-compose-release`
+- pins: `pins/github.nix`, `nojoin`
+- consumer: NixOS service module lives in the consuming NixOS flake
+- upstream: https://github.com/Valtora/Nojoin/releases
+- update rule: review the newest stable tagged release and its migration notes; update source and all first-party and supporting image digests together
+- hash rule: refresh the fetched source hash, parse first-party digests from the release notes, and resolve supporting image tags from the tagged Compose file to Docker Hub manifest digests
+- validate: `nix eval .#default.github.nojoin.apiImage`
+- notes: review-required because Compose topology and database migrations may change between releases
+
 ## Browser Extensions
 
 ### easy-container-shortcuts

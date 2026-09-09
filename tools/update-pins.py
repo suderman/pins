@@ -126,6 +126,17 @@ ENTRIES: tuple[Entry, ...] = (
         params={"owner": "suderman", "repo": "mpd-url"},
     ),
     Entry(
+        name="nojoin",
+        group="github",
+        pin_name="nojoin",
+        value_field="rev",
+        kind="github-compose-release",
+        policy="review",
+        checker="nojoin-release",
+        validate=("nix eval .#default.github.nojoin.apiImage",),
+        params={"owner": "Valtora", "repo": "Nojoin"},
+    ),
+    Entry(
         name="easy-container-shortcuts",
         group="firefox",
         pin_name="easy-container-shortcuts",
@@ -554,6 +565,8 @@ def find_candidate(entry: Entry, current: str, current_pin: dict[str, Any]) -> C
         return github_release_candidate(entry, current)
     if checker == "github-default-branch":
         return github_default_branch_candidate(entry)
+    if checker == "nojoin-release":
+        return nojoin_release_candidate(entry, current)
     if checker == "github-container":
         return github_container_candidate(entry, current)
     if checker == "dockerhub-semver":
@@ -589,6 +602,117 @@ def github_release_candidate(entry: Entry, current: str) -> Candidate:
     _key, value, tag = max(candidates, key=lambda item: item[0])
     reason = "current pin matches latest stable GitHub release" if value == current else f"latest stable GitHub release is {tag}"
     return Candidate(value=value, source=f"https://github.com/{owner}/{repo}/releases", reason=reason)
+
+
+def nojoin_release_candidate(entry: Entry, current: str) -> Candidate:
+    owner = entry.params["owner"]
+    repo = entry.params["repo"]
+    releases = http_json(f"https://api.github.com/repos/{owner}/{repo}/releases?per_page=100")
+    candidates = []
+    for release in releases:
+        if release.get("draft") or release.get("prerelease"):
+            continue
+        tag = str(release.get("tag_name", ""))
+        key = numeric_version_key(tag)
+        if key:
+            candidates.append((key, tag, release))
+    if not candidates:
+        return Candidate(value=None, reason=f"no stable numeric GitHub releases found for {owner}/{repo}")
+
+    _key, tag, release = max(candidates, key=lambda item: item[0])
+    fields = nojoin_image_fields(owner, repo, tag, str(release.get("body") or ""))
+    reason = "current pin matches latest stable Nojoin release" if tag == current else f"latest stable Nojoin release is {tag}"
+    return Candidate(value=tag, fields=fields, source=str(release.get("html_url") or ""), reason=reason)
+
+
+def nojoin_image_fields(owner: str, repo: str, tag: str, release_body: str) -> dict[str, str]:
+    first_party = {
+        "apiImage": "ghcr.io/valtora/nojoin-api",
+        "workerImage": "ghcr.io/valtora/nojoin-worker",
+        "workerIoImage": "ghcr.io/valtora/nojoin-worker-io",
+        "frontendImage": "ghcr.io/valtora/nojoin-frontend",
+    }
+    fields = {}
+    for field, image in first_party.items():
+        match = re.search(rf"`({re.escape(image)}@sha256:[0-9a-f]{{64}})`", release_body, re.IGNORECASE)
+        if not match:
+            raise UpdateError(f"Nojoin {tag} release notes do not contain a digest for {image}")
+        fields[field] = match.group(1).lower()
+
+    compose_url = f"https://raw.githubusercontent.com/{owner}/{repo}/{urllib.parse.quote(tag)}/docker-compose.example.yml"
+    compose = http_text(compose_url)
+    service_images = compose_service_images(compose)
+    supporting = {
+        "postgresImage": "db",
+        "redisImage": "redis",
+        "socketProxyImage": "socket-proxy",
+        "nginxImage": "nginx",
+    }
+    for field, service in supporting.items():
+        try:
+            image = service_images[service]
+        except KeyError as error:
+            raise UpdateError(f"Nojoin {tag} compose file has no image for service {service}") from error
+        fields[field] = dockerhub_image_with_digest(image)
+    return fields
+
+
+def compose_service_images(compose: str) -> dict[str, str]:
+    images = {}
+    service = None
+    in_services = False
+    for line in compose.splitlines():
+        if line == "services:":
+            in_services = True
+            continue
+        if not in_services:
+            continue
+        if line and not line.startswith(" "):
+            break
+        service_match = re.match(r"^  ([a-z0-9-]+):\s*$", line)
+        if service_match:
+            service = service_match.group(1)
+            continue
+        image_match = re.match(r"^    image:\s+([^\s#]+)", line)
+        if service and image_match:
+            images[service] = image_match.group(1)
+    return images
+
+
+def dockerhub_image_with_digest(image: str) -> str:
+    image_without_digest = image.split("@", 1)[0]
+    repository, separator, tag = image_without_digest.rpartition(":")
+    if not separator or "/" in tag:
+        repository = image_without_digest
+        tag = "latest"
+    parts = repository.split("/")
+    if len(parts) == 1:
+        namespace, repo = "library", parts[0]
+    elif len(parts) == 2 and "." not in parts[0] and ":" not in parts[0]:
+        namespace, repo = parts
+    else:
+        raise UpdateError(f"Nojoin supporting image is not on Docker Hub: {image}")
+
+    token_url = "https://auth.docker.io/token?" + urllib.parse.urlencode(
+        {"service": "registry.docker.io", "scope": f"repository:{namespace}/{repo}:pull"}
+    )
+    token = http_json(token_url)["token"]
+    manifest_url = f"https://registry-1.docker.io/v2/{namespace}/{repo}/manifests/{urllib.parse.quote(tag)}"
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Accept": ", ".join(
+            [
+                "application/vnd.oci.image.index.v1+json",
+                "application/vnd.docker.distribution.manifest.list.v2+json",
+                "application/vnd.docker.distribution.manifest.v2+json",
+            ]
+        ),
+    }
+    _body, response_headers = http_request(manifest_url, headers=headers)
+    digest = response_headers.get("Docker-Content-Digest")
+    if not digest or not re.fullmatch(r"sha256:[0-9a-f]{64}", digest):
+        raise UpdateError(f"Docker Hub did not report a manifest digest for {image}")
+    return f"{image_without_digest}@{digest}"
 
 
 def github_tag_candidates(owner: str, repo: str, *, strip_v: bool) -> list[tuple[tuple[int, ...], str, str]]:
@@ -1056,10 +1180,23 @@ def strip_leading_v(value: str) -> str:
 
 
 def http_json(url: str, headers: dict[str, str] | None = None) -> Any:
+    body, _headers = http_request(url, headers=headers)
+    try:
+        return json.loads(body.decode("utf-8"))
+    except json.JSONDecodeError as error:
+        raise UpdateError(f"GET {url} returned invalid JSON") from error
+
+
+def http_text(url: str, headers: dict[str, str] | None = None) -> str:
+    body, _headers = http_request(url, headers=headers)
+    return body.decode("utf-8")
+
+
+def http_request(url: str, headers: dict[str, str] | None = None) -> tuple[bytes, Any]:
     request = urllib.request.Request(url, headers=http_headers(url) | (headers or {}))
     try:
         with urllib.request.urlopen(request, timeout=60) as response:  # noqa: S310 - fixed upstream APIs.
-            return json.loads(response.read().decode("utf-8"))
+            return response.read(), response.headers
     except urllib.error.HTTPError as error:
         detail = error.read().decode("utf-8", errors="replace")[:500]
         raise UpdateError(f"GET {url} failed with HTTP {error.code}: {detail}") from error

@@ -31,6 +31,7 @@ flake.inputs.pins.default.containers.home-assistant.image
 flake.inputs.pins.default.containers.immich.serverImage
 flake.inputs.pins.default.github.honcho.rev
 flake.inputs.pins.default.github.honcho.hash
+flake.inputs.pins.default.github.nojoin.apiImage
 flake.inputs.pins.default.npm.hrvst-cli.packageLock
 ```
 
