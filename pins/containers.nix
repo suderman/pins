@@ -22,7 +22,7 @@
   };
 
   immich = rec {
-    version = "3.1.0";
+    version = "3.2.0";
     ref = version;
     serverImage = "ghcr.io/immich-app/immich-server:v${ref}";
     machineLearningImage = "ghcr.io/immich-app/immich-machine-learning:v${ref}";
