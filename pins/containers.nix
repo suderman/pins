@@ -22,7 +22,7 @@
   };
 
   immich = rec {
-    version = "3.2.0";
+    version = "3.2.1";
     ref = version;
     serverImage = "ghcr.io/immich-app/immich-server:v${ref}";
     machineLearningImage = "ghcr.io/immich-app/immich-machine-learning:v${ref}";
@@ -70,7 +70,7 @@
   };
 
   zwave-js-ui = rec {
-    version = "11.24.0";
+    version = "11.24.1";
     ref = version;
     image = "ghcr.io/zwave-js/zwave-js-ui:${ref}";
     upstream = "https://github.com/zwave-js/zwave-js-ui/pkgs/container/zwave-js-ui/versions?filters%5Bversion_type%5D=tagged";
