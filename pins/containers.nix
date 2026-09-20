@@ -1,10 +1,10 @@
 {
   backblaze-personal-wine = rec {
-    version = "1.9";
+    version = "2.1.1";
     ref = version;
     image = "tessypowder/backblaze-personal-wine:v${ref}";
     upstream = "https://hub.docker.com/r/tessypowder/backblaze-personal-wine/tags";
-    updatePolicy = "Intentionally conservative; confirm image behavior before jumping from v1.9.";
+    updatePolicy = "Intentionally conservative; review migrations and test persisted state before updating.";
   };
 
   codex-lb = rec {

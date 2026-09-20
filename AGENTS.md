@@ -219,7 +219,7 @@ Ignore floating tags such as `latest` unless the entry explicitly tracks one.
 - kind: `container-tag`
 - pins: `pins/containers.nix`, `backblaze-personal-wine`
 - upstream: https://hub.docker.com/r/tessypowder/backblaze-personal-wine/tags
-- update rule: intentionally conservative; confirm image behavior before jumping far past v1.9
+- update rule: intentionally conservative; review migrations and test existing persisted state before each update
 - hash rule: no source hash; update tag metadata only unless digest pinning is introduced later
 - validate: `nix eval .#default.containers.backblaze-personal-wine.image`
 
