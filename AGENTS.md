@@ -197,6 +197,16 @@ policy, hash refresh behavior, and validation without repeating current versions
 
 ## npm Packages
 
+### twiggy-language-server
+
+- kind: `npm-tarball`
+- pins: `pins/npm.nix`, `twiggy-language-server`
+- consumer: package wrapper lives in the Emacs flake
+- upstream: https://www.npmjs.com/package/twiggy-language-server
+- update rule: review the newest version selected by npm's `latest` dist-tag before updating the editor server
+- hash rule: use the registry tarball integrity; no dependency lockfile is needed because the published tarball bundles the executable and its runtime files
+- validate: `nix eval .#default.npm.twiggy-language-server.version`
+
 ### hrvst-cli
 
 - kind: `npm-package`

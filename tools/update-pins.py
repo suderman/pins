@@ -159,6 +159,17 @@ ENTRIES: tuple[Entry, ...] = (
         params={"owner": "NeverDecaf", "repo": "chromium-web-store", "strip_v": True},
     ),
     Entry(
+        name="twiggy-language-server",
+        group="npm",
+        pin_name="twiggy-language-server",
+        value_field="version",
+        kind="npm-tarball",
+        policy="review",
+        checker="npm-latest",
+        validate=("nix eval .#default.npm.twiggy-language-server.version",),
+        params={"package": "twiggy-language-server"},
+    ),
+    Entry(
         name="hrvst-cli",
         group="npm",
         pin_name="hrvst-cli",
@@ -896,7 +907,7 @@ def refresh_hash_fields(
         owner = entry.params["owner"]
         repo = entry.params["repo"]
         fields["hash"] = prefetch_github_source_hash(owner, repo, fields[entry.value_field])
-    if entry.group == "npm" and entry.value_field in fields:
+    if entry.kind == "npm-package" and entry.value_field in fields:
         fields["npmDepsHash"] = refresh_npm_lock(entry, fields.get("url", current_pin["url"]))
     return fields
 
@@ -988,7 +999,7 @@ def validate_entries(entries: tuple[Entry, ...], *, flake_check: bool) -> None:
     run(["git", "diff", "--check"])
     commands = []
     for entry in entries:
-        if entry.group == "npm":
+        if entry.kind == "npm-package":
             validate_npm_lock(entry)
         commands.extend(entry.validate)
     if flake_check:
