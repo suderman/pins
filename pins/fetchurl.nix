@@ -1,4 +1,12 @@
 {
+  camoufox = {
+    version = "152.0.4-beta.30";
+    url = "https://github.com/daijro/camoufox/releases/download/v152.0.4-beta.30/camoufox-152.0.4-beta.30-lin.x86_64.zip";
+    sha256 = "5720d45b894ce1770543de024c6f10d514b38be560fa2dc3226b3d8586caf672";
+    upstream = "https://github.com/daijro/camoufox/releases";
+    updatePolicy = "Report only, including beta releases. Verify compatibility with the Camofox server before updating.";
+  };
+
   citron = {
     pname = "citron-appimage";
     version = "nightly-40212aa3e";

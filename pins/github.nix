@@ -1,4 +1,15 @@
 {
+  camofox-browser = {
+    version = "2.4.8";
+    owner = "redf0x1";
+    repo = "camofox-browser";
+    rev = "v2.4.8";
+    hash = "sha256-fKg/s3cruPpfr3j1Muv/XAT4zLzHlRGw9s3ttGNQRTY=";
+    npmDepsHash = "sha256-Ugss4pzQOdYBipF6I6+qcFeemMVn0vrdNzSjuq+Zfgo=";
+    upstream = "https://github.com/redf0x1/camofox-browser/releases";
+    updatePolicy = "Report only. Test the server lockfile and Camoufox engine together before updating.";
+  };
+
   honcho = {
     owner = "plastic-labs";
     repo = "honcho";

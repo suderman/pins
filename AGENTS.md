@@ -117,6 +117,19 @@ This section documents how to update each manual dependency in `pins`.
 Current pinned values live in `pins/*.nix`. This registry should describe shape,
 policy, hash refresh behavior, and validation without repeating current versions.
 
+## Browser compatibility pair
+
+### camofox-browser and camoufox
+
+- kind: tagged GitHub source plus a Linux x86_64 browser release archive
+- pins: `pins/github.nix`, `camofox-browser`; `pins/fetchurl.nix`, `camoufox`
+- consumer: `/etc/nixos/packages/camofox-browser/default.nix`; browser check at `/etc/nixos/checks/camofox-browser.nix`
+- upstream: https://github.com/redf0x1/camofox-browser/releases and https://github.com/daijro/camoufox/releases
+- update rule: report-only for both entries. Check stable server releases and engine releases including betas, but do not bump either during scheduled maintenance. Manually select and test a compatible server lockfile and engine together before changing the baseline. These pins are not permanent freezes.
+- hash rule: refresh the server source hash and `npmDepsHash` from the tagged upstream lockfile; refresh the engine archive `sha256`. Keep server `version` and `rev` aligned. Do not regenerate its dependency lockfile independently.
+- validate: `python3 tools/test-camofox-pins.py`; `nix eval .#default.github.camofox-browser.rev`; `nix eval .#default.fetchurl.camoufox.url`; build the consuming NixOS `checks.x86_64-linux.camofox-browser` against the candidate pins. Pin-flake evaluation alone does not verify browser compatibility.
+- reason: the server installer fetched a newer engine whose fingerprint schema rejected fields emitted by its JS client. Disable runtime browser downloads in the consuming package.
+
 ## AppImages
 
 ### citron

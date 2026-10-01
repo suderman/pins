@@ -83,6 +83,27 @@ class Result:
 
 ENTRIES: tuple[Entry, ...] = (
     Entry(
+        name="camofox-browser",
+        group="github",
+        pin_name="camofox-browser",
+        value_field="rev",
+        kind="fetch-github-rev",
+        policy="report",
+        checker="github-release",
+        validate=("nix eval .#default.github.camofox-browser.rev",),
+        params={"owner": "redf0x1", "repo": "camofox-browser", "strip_v": False},
+    ),
+    Entry(
+        name="camoufox",
+        group="fetchurl",
+        pin_name="camoufox",
+        value_field="version",
+        kind="fetchurl-release",
+        policy="report",
+        checker="camoufox-release",
+        validate=("nix eval .#default.fetchurl.camoufox.url",),
+    ),
+    Entry(
         name="citron",
         group="fetchurl",
         pin_name="citron",
@@ -582,6 +603,8 @@ def find_candidate(entry: Entry, current: str, current_pin: dict[str, Any]) -> C
         return github_container_candidate(entry, current)
     if checker == "dockerhub-semver":
         return dockerhub_semver_candidate(entry, current)
+    if checker == "camoufox-release":
+        return camoufox_release_candidate()
     if checker == "citron-nightly":
         return citron_nightly_candidate()
     if checker == "amo-addon":
@@ -834,6 +857,33 @@ def docker_registry_tags(namespace: str, repo: str) -> list[str]:
     tags_url = f"https://registry-1.docker.io/v2/{repository}/tags/list?n=10000"
     data = http_json(tags_url, headers={"Authorization": f"Bearer {token}"})
     return data.get("tags") or []
+
+
+def camoufox_release_candidate() -> Candidate:
+    url = "https://api.github.com/repos/daijro/camoufox/releases?per_page=100"
+    candidates = []
+    for release in http_json(url):
+        if release.get("draft"):
+            continue
+        version = strip_leading_v(str(release.get("tag_name", "")))
+        match = re.fullmatch(r"(\d+)\.(\d+)\.(\d+)(?:-beta\.(\d+))?", version)
+        if not match:
+            continue
+        major, minor, patch, beta = match.groups()
+        key = (int(major), int(minor), int(patch), beta is None, int(beta or 0))
+        asset_name = f"camoufox-{version}-lin.x86_64.zip"
+        for asset in release.get("assets", []):
+            if asset.get("name") == asset_name:
+                candidates.append((key, version, asset["browser_download_url"]))
+    if not candidates:
+        return Candidate(value=None, reason="no Camoufox Linux x86_64 release asset found")
+    _key, version, asset_url = max(candidates)
+    return Candidate(
+        value=version,
+        fields={"url": asset_url},
+        source=url,
+        reason=f"latest Linux x86_64 engine is {version}; server compatibility must be tested",
+    )
 
 
 def citron_nightly_candidate() -> Candidate:

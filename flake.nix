@@ -39,6 +39,18 @@
     default = pins;
     inherit pins;
 
+    checks = forAllSystems (system: let
+      pkgs = pkgsFor system;
+    in {
+      camofox-pin-policy =
+        pkgs.runCommand "camofox-pin-policy" {
+          nativeBuildInputs = [pkgs.python3];
+        } ''
+          python3 ${./.}/tools/test-camofox-pins.py
+          touch "$out"
+        '';
+    });
+
     formatter = forAllSystems (system: formatterFor (pkgsFor system));
 
     devShells = forAllSystems (system: let
