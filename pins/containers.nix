@@ -15,7 +15,7 @@
   };
 
   home-assistant = rec {
-    version = "2026.9.4";
+    version = "2026.10.0";
     ref = version;
     image = "ghcr.io/home-assistant/home-assistant:${ref}";
     upstream = "https://github.com/home-assistant/core/pkgs/container/home-assistant/versions?filters%5Bversion_type%5D=tagged";
