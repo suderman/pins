@@ -9,9 +9,9 @@
 
   citron = {
     pname = "citron-appimage";
-    version = "nightly-40212aa3e";
-    url = "https://github.com/citron-neo/CI/releases/download/nightly-linux/citron_nightly-40212aa3e-linux-x86_64_v3.AppImage";
-    sha256 = "sha256-Ppo0V2dP/x4duQk1NoNKK5gyPsmZE1PAXfdXB5IS5jw=";
+    version = "nightly-352758980";
+    url = "https://github.com/citron-neo/CI/releases/download/nightly-linux/citron_nightly-352758980-linux-x86_64_v3.AppImage";
+    sha256 = "sha256-LIYttCaPdIO7lJ+OPqHwkT9yt721iCiQLTTfiSjiXXU=";
     upstream = "https://github.com/citron-neo/CI/releases";
     description = "Citron Nintendo Switch emulator AppImage";
   };
