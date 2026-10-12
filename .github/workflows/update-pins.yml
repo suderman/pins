@@ -1,8 +1,7 @@
 name: update pins
 
 on:
-  schedule:
-    - cron: "17 10 * * *"
+  # Started nightly by suderman/nixos's update-flake-lock workflow.
   workflow_dispatch:
 
 permissions:
