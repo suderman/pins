@@ -31,12 +31,12 @@
   nojoin = {
     owner = "Valtora";
     repo = "Nojoin";
-    rev = "v2.9.0";
-    hash = "sha256-7iXeV2HAyvAcuFfVEGpmpRq9LnF3ic9C7pVSBr6D8rY=";
-    apiImage = "ghcr.io/valtora/nojoin-api@sha256:20054622dcf7c65ae40358cd5f4554b7a56bc18a205a1315d8ec9c8fd6dbd6cd";
-    workerImage = "ghcr.io/valtora/nojoin-worker@sha256:0a9abcb52916b5bc6755903017c223fac0c4b82c0105d21bc1db0ba322ff6438";
-    workerIoImage = "ghcr.io/valtora/nojoin-worker-io@sha256:69cbff52d8853f454dfa57c7a147e829b44613449899319563341436e5ffcd1d";
-    frontendImage = "ghcr.io/valtora/nojoin-frontend@sha256:1ccfc05678b1ad4275cf4f9c51b5e789d7973dbeaee8183cf1224e6d3c3253e7";
+    rev = "v2.10.0";
+    hash = "sha256-/l+tJENnkcBL1d4n+5QdixCsA1/2LpFL+ipQJMYwTlE=";
+    apiImage = "ghcr.io/valtora/nojoin-api@sha256:bb9d0be068c5475f3ebff808d6e1d5c5fd21a5b8b3e2aa7b04ebe9405aa8495e";
+    workerImage = "ghcr.io/valtora/nojoin-worker@sha256:e369ce7a0588245c1bdc29ca21f296667282aa3560a28b20f51a0c602bc0b7dd";
+    workerIoImage = "ghcr.io/valtora/nojoin-worker-io@sha256:e64bf339cc33fcd669092b4d3f8c6e8e121fb3159525518111d991ea94426267";
+    frontendImage = "ghcr.io/valtora/nojoin-frontend@sha256:726fab295821292c8dae634cbe1c4bd8b1280955fec1a175452d5cccfb77bb3e";
     postgresImage = "pgvector/pgvector:pg18-trixie@sha256:9d9c930220cb9bf2f956d10a8f909cf9973d9672ca0278aef2c1e6facccad2e0";
     redisImage = "redis:alpine@sha256:3811787313eba226a2ef38658c6ccb91cd5e110edc89c37767de373120a0e5a0";
     socketProxyImage = "tecnativa/docker-socket-proxy@sha256:1f5038b54f06c3e18422902cf00ba21803d1c97805aae032e5e6673d532d3459";
