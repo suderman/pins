@@ -1,9 +1,9 @@
 {
   twiggy-language-server = {
     pname = "twiggy-language-server";
-    version = "26.4.1";
-    url = "https://registry.npmjs.org/twiggy-language-server/-/twiggy-language-server-26.4.1.tgz";
-    hash = "sha512-4jbD9d5SL4Ad0EA0c5982QXtZJJB54EwmKmNwYJqPwYmiyok1buOWtjs3ld2wK22OCkkxnhJVU1Hcrm+l92+Tg==";
+    version = "26.10.1";
+    url = "https://registry.npmjs.org/twiggy-language-server/-/twiggy-language-server-26.10.1.tgz";
+    hash = "sha512-n/fgxWDqj6GH4Z5JNc6fBjD9LNayLqP6yfRiUNvUM8lWneyZTnh9adV9ye38FVmpwGMhda3gi3WylsETJaW1IA==";
     upstream = "https://www.npmjs.com/package/twiggy-language-server";
     description = "Twig language server";
   };

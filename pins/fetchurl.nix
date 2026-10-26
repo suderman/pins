@@ -9,18 +9,18 @@
 
   citron = {
     pname = "citron-appimage";
-    version = "nightly-52f3ea795";
-    url = "https://github.com/citron-neo/CI/releases/download/nightly-linux/citron_nightly-52f3ea795-linux-x86_64_v3.AppImage";
-    sha256 = "sha256-XttPEqNh9zKEnrwkbhq1gieBsDxPZA/RvbgRaDzwkxg=";
+    version = "nightly-56dad8119";
+    url = "https://github.com/citron-neo/CI/releases/download/nightly-linux/citron_nightly-56dad8119-linux-x86_64_v3.AppImage";
+    sha256 = "sha256-lf9SBsOyddhvYUNq7K+TZMTKKbbGN7/9hrvj0Ti/T0E=";
     upstream = "https://github.com/citron-neo/CI/releases";
     description = "Citron Nintendo Switch emulator AppImage";
   };
 
   eden = {
     pname = "eden-appimage";
-    version = "0.2.0-rc2";
-    url = "https://git.eden-emu.dev/eden-emu/eden/releases/download/v0.2.0-rc2/Eden-Linux-v0.2.0-rc2-amd64-gcc-standard.AppImage";
-    sha256 = "sha256-1Pp6VInWYfr8f8ANuT1ZBxe61xCWcTq/mNH8T6JZJJc=";
+    version = "0.2.1";
+    url = "https://git.eden-emu.dev/eden-emu/eden/releases/download/v0.2.1/Eden-Linux-v0.2.1-amd64-gcc-standard.AppImage";
+    sha256 = "sha256-L65lg5fa8TwRgIKj62XWGmUZlnteIuZmd1a67PYADFo=";
     upstream = "https://git.eden-emu.dev/eden-emu/eden/releases";
     description = "Eden Nintendo Switch emulator AppImage";
   };
