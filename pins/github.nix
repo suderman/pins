@@ -38,7 +38,7 @@
     workerIoImage = "ghcr.io/valtora/nojoin-worker-io@sha256:e64bf339cc33fcd669092b4d3f8c6e8e121fb3159525518111d991ea94426267";
     frontendImage = "ghcr.io/valtora/nojoin-frontend@sha256:726fab295821292c8dae634cbe1c4bd8b1280955fec1a175452d5cccfb77bb3e";
     postgresImage = "pgvector/pgvector:pg18-trixie@sha256:9d9c930220cb9bf2f956d10a8f909cf9973d9672ca0278aef2c1e6facccad2e0";
-    redisImage = "redis:alpine@sha256:0bf6577d7774e592b29d093e3ac9390eb91e13d72c21e506afce736de5e0eeb0";
+    redisImage = "redis:alpine@sha256:47b08295737773de3b711fb86f13ae802f5074e96a9a2d29f5f80164ac08c046";
     socketProxyImage = "tecnativa/docker-socket-proxy@sha256:1f5038b54f06c3e18422902cf00ba21803d1c97805aae032e5e6673d532d3459";
     nginxImage = "nginx:alpine@sha256:a3554c0d0b48177b1413c26e01f695334428020d9df01243fbae3e11cfd17417";
     upstream = "https://github.com/Valtora/Nojoin/releases";
