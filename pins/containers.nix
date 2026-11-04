@@ -14,6 +14,17 @@
     upstream = "https://github.com/Soju06/codex-lb/pkgs/container/codex-lb";
   };
 
+  comfyui = rec {
+    repository = "ghcr.io/utensils/comfyui-nix";
+    tag = "latest-cuda";
+    digest = "sha256:c8bf5418f14c552f81d5a12a07d85ba6f17aaf4ee77008f9122c5f64e15a9b3c";
+    image = "${repository}@${digest}";
+    upstream = "https://github.com/utensils/comfyui-nix/pkgs/container/comfyui-nix";
+    # Temporary upstream SAM editor fix until the image includes it.
+    samEditorUrl = "https://raw.githubusercontent.com/ltdrdata/ComfyUI-Impact-Pack/85f76ea6acf964fd6e8911d3c1510d64676f4ea2/js/impact-sam-editor.js";
+    samEditorHash = "sha256-zW+ZZf+AXp1AjxcWaS35MXovD9r7ULI/fgckIs/y7sU=";
+  };
+
   home-assistant = rec {
     version = "2026.10.4";
     ref = version;

@@ -224,6 +224,17 @@ ENTRIES: tuple[Entry, ...] = (
         params={"owner_kind": "users", "owner": "Soju06", "package": "codex-lb", "strip_v": False},
     ),
     Entry(
+        name="comfyui",
+        group="containers",
+        pin_name="comfyui",
+        value_field="digest",
+        kind="container-digest",
+        policy="auto",
+        checker="ghcr-digest",
+        validate=("nix eval .#default.containers.comfyui.image",),
+        params={"repository": "utensils/comfyui-nix", "tag": "latest-cuda"},
+    ),
+    Entry(
         name="home-assistant",
         group="containers",
         pin_name="home-assistant",
@@ -601,6 +612,8 @@ def find_candidate(entry: Entry, current: str, current_pin: dict[str, Any]) -> C
         return nojoin_release_candidate(entry, current)
     if checker == "github-container":
         return github_container_candidate(entry, current)
+    if checker == "ghcr-digest":
+        return ghcr_digest_candidate(entry)
     if checker == "dockerhub-semver":
         return dockerhub_semver_candidate(entry, current)
     if checker == "camoufox-release":
@@ -770,6 +783,37 @@ def github_default_branch_candidate(entry: Entry) -> Candidate:
     branch_data = http_json(f"https://api.github.com/repos/{owner}/{repo}/branches/{urllib.parse.quote(branch)}")
     sha = branch_data["commit"]["sha"]
     return Candidate(value=sha, source=f"https://github.com/{owner}/{repo}/tree/{branch}", reason=f"default branch {branch} points at {sha[:12]}")
+
+
+def ghcr_digest_candidate(entry: Entry) -> Candidate:
+    repository = entry.params["repository"]
+    tag = entry.params["tag"]
+    token_url = "https://ghcr.io/token?" + urllib.parse.urlencode(
+        {"service": "ghcr.io", "scope": f"repository:{repository}:pull"}
+    )
+    token = http_json(token_url)["token"]
+    url = (
+        f"https://ghcr.io/v2/{repository}/manifests/{urllib.parse.quote(tag, safe='')}"
+    )
+    _body, headers = http_request(
+        url,
+        headers={
+            "Authorization": f"Bearer {token}",
+            "Accept": ", ".join(
+                [
+                    "application/vnd.oci.image.index.v1+json",
+                    "application/vnd.docker.distribution.manifest.list.v2+json",
+                    "application/vnd.docker.distribution.manifest.v2+json",
+                ]
+            ),
+        },
+    )
+    digest = headers.get("Docker-Content-Digest")
+    if not digest or not re.fullmatch(r"sha256:[0-9a-f]{64}", digest):
+        raise UpdateError(
+            f"GHCR did not report a manifest digest for {repository}:{tag}"
+        )
+    return Candidate(value=digest, source=url, reason=f"manifest digest for {tag}")
 
 
 def github_container_candidate(entry: Entry, current: str) -> Candidate:

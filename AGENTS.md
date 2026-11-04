@@ -255,6 +255,16 @@ Ignore floating tags such as `latest` unless the entry explicitly tracks one.
 - hash rule: no source hash; update tag metadata only unless digest pinning is introduced later
 - validate: `nix eval .#default.containers.codex-lb.image`
 
+### comfyui
+
+- kind: `container-digest`
+- pins: `pins/containers.nix`, `comfyui`
+- consumer: `/etc/nixos/modules/nixos/default/options/comfyui/default.nix`
+- upstream: https://github.com/utensils/comfyui-nix/pkgs/container/comfyui-nix
+- update rule: resolve the public GHCR `latest-cuda` manifest digest on each scheduled check. This entry explicitly tracks that floating CUDA flavor as a digest; do not select CPU, ROCm, XPU or architecture-specific tags. Keep the consuming NixOS flake free of the vendor flake input and local CUDA compilation.
+- hash rule: refresh `digest` from GHCR's `Docker-Content-Digest` header. `image` follows it automatically. Keep the corrective `samEditorUrl` and `samEditorHash` unchanged during scheduled image updates; those identify a reviewed upstream JS fix, not a second moving release. Remove the consuming compatibility layer and these fields once the image contains the fix.
+- validate: `nix eval .#default.containers.comfyui.image`; `tools/update-pins.py check --entry comfyui`; validate consuming service, frontend, Manager and CUDA when testing a new image.
+
 ### home-assistant
 
 - kind: `container-tag`
