@@ -26,7 +26,7 @@
   };
 
   home-assistant = rec {
-    version = "2026.11.0";
+    version = "2026.11.1";
     ref = version;
     image = "ghcr.io/home-assistant/home-assistant:${ref}";
     upstream = "https://github.com/home-assistant/core/pkgs/container/home-assistant/versions?filters%5Bversion_type%5D=tagged";
@@ -81,7 +81,7 @@
   };
 
   zwave-js-ui = rec {
-    version = "11.25.2";
+    version = "11.26.0";
     ref = version;
     image = "ghcr.io/zwave-js/zwave-js-ui:${ref}";
     upstream = "https://github.com/zwave-js/zwave-js-ui/pkgs/container/zwave-js-ui/versions?filters%5Bversion_type%5D=tagged";
