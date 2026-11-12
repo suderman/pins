@@ -13,8 +13,8 @@
   honcho = {
     owner = "plastic-labs";
     repo = "honcho";
-    rev = "v3.6.0";
-    hash = "sha256-vmBzsZX+R5AL7arjf93g4NVCAZ6XFFXBgYE1BWO+rLI=";
+    rev = "v3.6.1";
+    hash = "sha256-prbjOEN5jWUEzjPHxjs4ELtaMGU1BRk3h4dII1GQqf4=";
     upstream = "https://github.com/plastic-labs/honcho/releases";
     updatePolicy = "Track tagged releases, not branch heads.";
   };
@@ -31,14 +31,14 @@
   nojoin = {
     owner = "Valtora";
     repo = "Nojoin";
-    rev = "v3.0.0";
-    hash = "sha256-hhfNvWVAj0gv9//dsCWVEdx8SE2IiHdVcB7CvpV+jaQ=";
-    apiImage = "ghcr.io/valtora/nojoin-api@sha256:892c7aefb73fb6744146647277cbd3f4e51a86a364f5cb04e5f559839663d45b";
-    workerImage = "ghcr.io/valtora/nojoin-worker@sha256:336063657cfe59d3b4eff53e7248105f993083c46b195c529af1a1865fd0572d";
-    workerIoImage = "ghcr.io/valtora/nojoin-worker-io@sha256:2ac054eedb361263ce0ff7de6891ecdd5d71aa02e184cd6adfed2152c53ea1a3";
-    frontendImage = "ghcr.io/valtora/nojoin-frontend@sha256:926ac75196cb7be81424fb288516300d9848a4bbfc04eb01aa9b03d3c7bf993f";
+    rev = "v3.1.0";
+    hash = "sha256-shi0rBJbVkaaR8/lErQi1A7UL7ufKfl24dC0WmQP5qw=";
+    apiImage = "ghcr.io/valtora/nojoin-api@sha256:596e39764e7edd1a6151159c51ecab1dd01a54edf45deeadab8cb682b31e7661";
+    workerImage = "ghcr.io/valtora/nojoin-worker@sha256:43a49fe3803815c087956b927f0030c70f81fbb3687abfeba00aff5123462575";
+    workerIoImage = "ghcr.io/valtora/nojoin-worker-io@sha256:9272e47f523909dd5e0af8b18da2e2e15e88d4ecf1742ba86434707900e9fd52";
+    frontendImage = "ghcr.io/valtora/nojoin-frontend@sha256:98740b73a901ad09ed13d133cb33565f41434ff6ddecf7db2e5f67a081e77e87";
     postgresImage = "pgvector/pgvector:pg18-trixie@sha256:5895949dfcdf308eb0cd31c950c93c14895c77f33fbedfecf1fa511ab1d4bcd2";
-    redisImage = "redis:alpine@sha256:71885d8cc6e42f2bc0aa2eb853bfc4be200b5108a46ac50e117ae1df0531fb80";
+    redisImage = "redis:alpine@sha256:7958cfbb9d152f87dadfbc89f1b0b15938f0b81ff8982feb327476f4911935c3";
     socketProxyImage = "tecnativa/docker-socket-proxy@sha256:1f5038b54f06c3e18422902cf00ba21803d1c97805aae032e5e6673d532d3459";
     nginxImage = "nginx:alpine@sha256:713fc2ebfd92e8217db451477182ee91944b123d2b1ee9fd5a8c6e91ca6c3a11";
     upstream = "https://github.com/Valtora/Nojoin/releases";
